@@ -1,8 +1,7 @@
 'use client';
 
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 
 interface EventDetailProps {
   event: {
@@ -18,6 +17,38 @@ interface EventDetailProps {
 }
 
 const EventDetail: FC<EventDetailProps> = ({ event }) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePayment = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('http://localhost:3001/payments/create-preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventId: event.id,
+          eventName: event.name,
+          price: event.price,
+          quantity: 1, // Por defecto compra 1 entrada
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear el pago');
+      }
+
+      const data = await response.json();
+      window.location.href = data.initPoint; // Redirige a la URL de pago de MercadoPago
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Hubo un error al procesar el pago. Por favor, intente nuevamente.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -69,12 +100,13 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
               <span className="text-sm text-gray-500">por entrada</span>
             </div>
             
-            <Link
-              href={`/eventos/${event.id}/comprar`}
-              className="block w-full bg-black text-white text-center py-4 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+            <button
+              onClick={handlePayment}
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400"
             >
-              Comprar Entradas
-            </Link>
+              {isLoading ? 'Procesando...' : 'Comprar Entradas'}
+            </button>
           </div>
         </div>
       </div>
