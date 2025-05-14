@@ -4,11 +4,11 @@ import Footer from '@/components/Footer';
 // Mock data - In a real application, this would come from an API
 const mockEvent = {
   id: '1',
-  name: 'Coldplay en Rosario',
-  date: '15 de Marzo, 2024',
+  name: 'Fiaca en García',
+  date: '15 de Junio, 2025',
   time: '20:00',
-  image: 'https://placehold.co/1200x600/1DB954/FFFFFF/png?text=Coldplay+en+Rosario',
-  venue: 'Estadio Gigante de Arroyito',
+  image: 'https://placehold.co/1200x600/1DB954/FFFFFF/png?text=Fiaca+en+García',
+  venue: 'García bar, Rosario',
   availableTickets: 1500,
   price: 10
 };
