@@ -23,7 +23,7 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${process.env.BACKEND_URL}/payments/create-preference`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/payments/create-preference`,
         {
           method: "POST",
           headers: {
