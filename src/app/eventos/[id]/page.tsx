@@ -13,13 +13,13 @@ const mockEvent = {
   price: 25000
 };
 
-interface EventPageProps {
+export interface EventPageProps {
   params: {
     id: string;
   };
 }
 
-export default function EventPage({ params }: EventPageProps) {
+export default function EventPage() {
   // En una aplicación real, aquí buscarías el evento por ID en tu API
   // const event = await fetchEvent(params.id);
   
