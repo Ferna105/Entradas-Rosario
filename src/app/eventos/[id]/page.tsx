@@ -10,7 +10,7 @@ const mockEvent = {
   image: 'https://placehold.co/1200x600/1DB954/FFFFFF/png?text=Coldplay+en+Rosario',
   venue: 'Estadio Gigante de Arroyito',
   availableTickets: 1500,
-  price: 25000
+  price: 10
 };
 
 export interface EventPageProps {
