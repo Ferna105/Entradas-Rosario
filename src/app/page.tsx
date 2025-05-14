@@ -1,103 +1,70 @@
-import Image from "next/image";
+import EventCarousel from '@/components/EventCarousel';
+import EventList from '@/components/EventList';
+import Footer from '@/components/Footer';
+
+// Mock data - In a real application, this would come from an API
+const mockEvents = [
+  {
+    id: '1',
+    name: 'Coldplay en Rosario',
+    date: '15 de Marzo, 2024',
+    time: '20:00',
+    image: 'https://placehold.co/1200x400/1DB954/FFFFFF/png?text=Coldplay+en+Rosario',
+    venue: 'Estadio Gigante de Arroyito'
+  },
+  {
+    id: '2',
+    name: 'Metallica World Tour',
+    date: '20 de Marzo, 2024',
+    time: '21:00',
+    image: 'https://placehold.co/1200x400/000000/FFFFFF/png?text=Metallica+World+Tour',
+    venue: 'Estadio Gigante de Arroyito'
+  },
+  {
+    id: '3',
+    name: 'Taylor Swift - The Eras Tour',
+    date: '25 de Marzo, 2024',
+    time: '19:30',
+    image: 'https://placehold.co/1200x400/FF69B4/FFFFFF/png?text=Taylor+Swift+-+The+Eras+Tour',
+    venue: 'Estadio Gigante de Arroyito'
+  },
+  {
+    id: '4',
+    name: 'Los Redondos - Tributo',
+    date: '30 de Marzo, 2024',
+    time: '22:00',
+    image: 'https://placehold.co/600x400/FF0000/FFFFFF/png?text=Los+Redondos+-+Tributo',
+    venue: 'Teatro Broadway'
+  },
+  {
+    id: '5',
+    name: 'La Renga',
+    date: '5 de Abril, 2024',
+    time: '21:00',
+    image: 'https://placehold.co/600x400/0000FF/FFFFFF/png?text=La+Renga',
+    venue: 'Estadio Gigante de Arroyito'
+  },
+  {
+    id: '6',
+    name: 'Divididos',
+    date: '10 de Abril, 2024',
+    time: '20:30',
+    image: 'https://placehold.co/600x400/FFA500/FFFFFF/png?text=Divididos',
+    venue: 'Teatro Broadway'
+  }
+];
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">
+        <EventCarousel events={mockEvents.slice(0, 3)} />
+        <div className="container mx-auto py-12">
+          <h2 className="text-3xl font-bold mb-8 text-center">Próximos Eventos</h2>
+          <EventList events={mockEvents} />
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <Footer />
     </div>
   );
 }
