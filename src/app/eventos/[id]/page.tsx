@@ -4,14 +4,9 @@ import { useEffect, useState } from "react";
 import EventDetail from "@/components/EventDetail";
 import { Event } from "@/types/event";
 import { eventsService } from "@/services/events";
+import Footer from "@/components/Footer";
 
-export interface EventPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function EventPage({ params }: EventPageProps) {
+export default function EventPage({ params }: { params: { id: string } }) {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -37,6 +32,7 @@ export default function EventPage({ params }: EventPageProps) {
         <main className="flex-grow flex items-center justify-center">
           <div className="text-center">Cargando evento...</div>
         </main>
+        <Footer />
       </div>
     );
   }
@@ -49,6 +45,7 @@ export default function EventPage({ params }: EventPageProps) {
             {error || "Evento no encontrado"}
           </div>
         </main>
+        <Footer />
       </div>
     );
   }
@@ -58,6 +55,7 @@ export default function EventPage({ params }: EventPageProps) {
       <main className="flex-grow">
         <EventDetail event={event} />
       </main>
+      <Footer />
     </div>
   );
 }
