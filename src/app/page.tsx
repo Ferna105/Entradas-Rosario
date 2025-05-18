@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import EventCarousel from "@/components/EventCarousel";
 import EventList from "@/components/EventList";
-import Footer from "@/components/Footer";
 import { Event } from "@/types/event";
 import { eventsService } from "@/services/events";
 
@@ -45,7 +44,6 @@ export default function Home() {
           </>
         )}
       </main>
-      <Footer />
     </div>
   );
 }
