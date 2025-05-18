@@ -1,17 +1,10 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import EventDetail from '@/components/EventDetail';
 import Footer from '@/components/Footer';
-
-// Mock data - In a real application, this would come from an API
-const mockEvent = {
-  id: '1',
-  name: 'Fiaca en García',
-  date: '15 de Junio, 2025',
-  time: '20:00',
-  image: 'https://placehold.co/1200x600/1DB954/FFFFFF/png?text=Fiaca+en+García',
-  venue: 'García bar, Rosario',
-  availableTickets: 1500,
-  price: 10
-};
+import { Event } from '@/types/event';
+import { eventsService } from '@/services/events';
 
 export interface EventPageProps {
   params: {
@@ -19,14 +12,52 @@ export interface EventPageProps {
   };
 }
 
-export default function EventPage() {
-  // En una aplicación real, aquí buscarías el evento por ID en tu API
-  // const event = await fetchEvent(params.id);
-  
+export default function EventPage({ params }: EventPageProps) {
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    async function fetchEvent() {
+      try {
+        const data = await eventsService.getEvent(params.id);
+        setEvent(data);
+      } catch {
+        setError('No se pudo cargar el evento');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchEvent();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">Cargando evento...</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !event) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center text-red-500">{error || 'Evento no encontrado'}</div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
-        <EventDetail event={mockEvent} />
+        <EventDetail event={event} />
       </main>
       <Footer />
     </div>

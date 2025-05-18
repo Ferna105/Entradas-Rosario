@@ -1,68 +1,49 @@
-import EventCarousel from '@/components/EventCarousel';
-import EventList from '@/components/EventList';
-import Footer from '@/components/Footer';
+"use client";
 
-// Mock data - In a real application, this would come from an API
-const mockEvents = [
-  {
-    id: '1',
-    name: 'Coldplay en Rosario',
-    date: '15 de Marzo, 2024',
-    time: '20:00',
-    image: 'https://placehold.co/1200x400/1DB954/FFFFFF/png?text=Coldplay+en+Rosario',
-    venue: 'Estadio Gigante de Arroyito'
-  },
-  {
-    id: '2',
-    name: 'Metallica World Tour',
-    date: '20 de Marzo, 2024',
-    time: '21:00',
-    image: 'https://placehold.co/1200x400/000000/FFFFFF/png?text=Metallica+World+Tour',
-    venue: 'Estadio Gigante de Arroyito'
-  },
-  {
-    id: '3',
-    name: 'Taylor Swift - The Eras Tour',
-    date: '25 de Marzo, 2024',
-    time: '19:30',
-    image: 'https://placehold.co/1200x400/FF69B4/FFFFFF/png?text=Taylor+Swift+-+The+Eras+Tour',
-    venue: 'Estadio Gigante de Arroyito'
-  },
-  {
-    id: '4',
-    name: 'Los Redondos - Tributo',
-    date: '30 de Marzo, 2024',
-    time: '22:00',
-    image: 'https://placehold.co/600x400/FF0000/FFFFFF/png?text=Los+Redondos+-+Tributo',
-    venue: 'Teatro Broadway'
-  },
-  {
-    id: '5',
-    name: 'La Renga',
-    date: '5 de Abril, 2024',
-    time: '21:00',
-    image: 'https://placehold.co/600x400/0000FF/FFFFFF/png?text=La+Renga',
-    venue: 'Estadio Gigante de Arroyito'
-  },
-  {
-    id: '6',
-    name: 'Divididos',
-    date: '10 de Abril, 2024',
-    time: '20:30',
-    image: 'https://placehold.co/600x400/FFA500/FFFFFF/png?text=Divididos',
-    venue: 'Teatro Broadway'
-  }
-];
+import { useEffect, useState } from "react";
+import EventCarousel from "@/components/EventCarousel";
+import EventList from "@/components/EventList";
+import Footer from "@/components/Footer";
+import { Event } from "@/types/event";
+import { eventsService } from "@/services/events";
 
 export default function Home() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const data = await eventsService.getUpcomingEvents();
+        setEvents(data);
+      } catch {
+        setError("No se pudieron cargar los eventos.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEvents();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow">
-        <EventCarousel events={mockEvents.slice(0, 3)} />
-        <div className="container mx-auto py-12">
-          <h2 className="text-3xl font-bold mb-8 text-center">Próximos Eventos</h2>
-          <EventList events={mockEvents} />
-        </div>
+        {loading ? (
+          <div className="text-center py-12">Cargando eventos...</div>
+        ) : error ? (
+          <div className="text-center text-red-500 py-12">{error}</div>
+        ) : (
+          <>
+            <EventCarousel events={events.slice(0, 3)} />
+            <div className="container mx-auto py-12">
+              <h2 className="text-3xl font-bold mb-8 text-center">
+                Próximos Eventos
+              </h2>
+              <EventList events={events} />
+            </div>
+          </>
+        )}
       </main>
       <Footer />
     </div>
