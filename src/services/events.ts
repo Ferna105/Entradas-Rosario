@@ -3,8 +3,8 @@ import { Event } from '@/types/event';
 
 interface CreatePaymentPreferenceParams {
   eventId: number;
-  eventName: string;
-  price: number;
+  buyerEmail: string;
+  buyerName: string;
   quantity: number;
 }
 
