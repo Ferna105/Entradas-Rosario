@@ -64,11 +64,16 @@ export default function EditEventPage({
     router.push("/dashboard");
   };
 
+  const formInitial: Partial<CreateEventData> = {
+    ...event,
+    image: event.image ?? undefined,
+  };
+
   return (
     <EventForm
       title="Editar Evento"
       submitLabel="Guardar Cambios"
-      initialData={event}
+      initialData={formInitial}
       onSubmit={handleUpdate}
     />
   );

@@ -5,7 +5,7 @@ interface RegisterParams {
   name: string;
   email: string;
   password: string;
-  type?: 'buyer' | 'seller';
+  type?: 'buyer' | 'seller' | 'scanner';
 }
 
 interface LoginParams {

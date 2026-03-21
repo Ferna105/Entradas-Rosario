@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -31,7 +31,7 @@ const statusLabel: Record<string, { text: string; color: string }> = {
   finished: { text: "Finalizado", color: "bg-blue-100 text-blue-800" },
 };
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -122,8 +122,9 @@ export default function DashboardPage() {
       setScannerEventId(null);
       setScannerMsg("Escaneador asignado correctamente");
       loadScanners(eventId);
-    } catch (err: any) {
-      setScannerMsg(err?.message || "Error al asignar escaneador");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al asignar escaneador";
+      setScannerMsg(msg);
     }
   };
 
@@ -384,5 +385,19 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[80vh] flex items-center justify-center">
+          <p className="text-gray-400">Cargando...</p>
+        </div>
+      }
+    >
+      <DashboardPageContent />
+    </Suspense>
   );
 }

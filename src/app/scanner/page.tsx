@@ -103,7 +103,7 @@ export default function ScannerPage() {
         },
         () => {}
       );
-    } catch (err) {
+    } catch {
       setError(
         "No se pudo acceder a la cámara. Verificá los permisos del navegador."
       );

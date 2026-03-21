@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiClient } from "@/services/api";
@@ -27,7 +27,7 @@ interface PurchaseInfo {
   tickets: TicketInfo[];
 }
 
-export default function CompraExitoPage() {
+function CompraExitoContent() {
   const searchParams = useSearchParams();
   const purchaseId = searchParams.get("purchase");
   const [purchase, setPurchase] = useState<PurchaseInfo | null>(null);
@@ -143,11 +143,14 @@ export default function CompraExitoPage() {
                           Entrada {index + 1} de {purchase.tickets.length}
                         </p>
                         {ticket.qr_code && (
-                          <img
-                            src={ticket.qr_code}
-                            alt={`QR Entrada ${index + 1}`}
-                            className="w-64 h-64 mx-auto"
-                          />
+                          <>
+                            {/* eslint-disable-next-line @next/next/no-img-element -- data URL del QR */}
+                            <img
+                              src={ticket.qr_code}
+                              alt={`QR Entrada ${index + 1}`}
+                              className="w-64 h-64 mx-auto"
+                            />
+                          </>
                         )}
                         <p className="text-xs text-gray-400 mt-3 font-mono break-all">
                           {ticket.qr_data}
@@ -200,5 +203,19 @@ export default function CompraExitoPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function CompraExitoPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[80vh] flex items-center justify-center">
+          <p className="text-gray-400">Cargando...</p>
+        </div>
+      }
+    >
+      <CompraExitoContent />
+    </Suspense>
   );
 }
