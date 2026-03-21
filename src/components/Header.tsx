@@ -47,7 +47,7 @@ export default function Header() {
                     </p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                     <p className="text-xs text-gray-400 capitalize mt-1">
-                      {user.type === "seller" ? "Organizador" : user.type === "buyer" ? "Comprador" : user.type}
+                      {user.type === "seller" ? "Organizador" : user.type === "buyer" ? "Comprador" : user.type === "scanner" ? "Escaneador" : user.type}
                     </p>
                   </div>
                   {(user.type === "seller" || user.type === "admin") && (
@@ -57,6 +57,15 @@ export default function Header() {
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Mis Eventos
+                    </Link>
+                  )}
+                  {user.type === "scanner" && (
+                    <Link
+                      href="/scanner"
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Escanear Entradas
                     </Link>
                   )}
                   <button

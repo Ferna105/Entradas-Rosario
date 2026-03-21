@@ -19,7 +19,7 @@ interface AuthContextType {
     name: string,
     email: string,
     password: string,
-    type?: "buyer" | "seller"
+    type?: "buyer" | "seller" | "scanner"
   ) => Promise<void>;
   logout: () => void;
 }
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     email: string,
     password: string,
-    type?: "buyer" | "seller"
+    type?: "buyer" | "seller" | "scanner"
   ) => {
     const response = await authService.register({ name, email, password, type });
     setUser(response.user);

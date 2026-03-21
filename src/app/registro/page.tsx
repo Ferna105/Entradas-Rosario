@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [type, setType] = useState<"buyer" | "seller">("buyer");
+  const [type, setType] = useState<"buyer" | "seller" | "scanner">("buyer");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -139,7 +139,7 @@ export default function RegisterPage() {
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Tipo de cuenta
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => setType("buyer")}
@@ -161,6 +161,17 @@ export default function RegisterPage() {
                   }`}
                 >
                   Organizador
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setType("scanner")}
+                  className={`py-3 px-4 rounded-lg border-2 text-sm font-medium transition-colors ${
+                    type === "scanner"
+                      ? "border-black bg-black text-white"
+                      : "border-gray-300 text-gray-700 hover:border-gray-400"
+                  }`}
+                >
+                  Escaneador
                 </button>
               </div>
             </div>

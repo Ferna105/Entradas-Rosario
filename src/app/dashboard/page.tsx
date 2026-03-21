@@ -7,6 +7,14 @@ import { useAuth } from "@/context/AuthContext";
 import { Event } from "@/types/event";
 import { eventsService } from "@/services/events";
 import { mpService } from "@/services/mercadopago";
+import { apiClient } from "@/services/api";
+
+interface AssignedScanner {
+  id: number;
+  name: string;
+  email: string;
+  assigned_at: string;
+}
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("es-AR", {
@@ -91,6 +99,49 @@ export default function DashboardPage() {
     } catch {
       setMpMessage("Error al desvincular");
     }
+  };
+
+  const [scannersByEvent, setScannersByEvent] = useState<Record<number, AssignedScanner[]>>({});
+  const [scannerEmail, setScannerEmail] = useState("");
+  const [scannerEventId, setScannerEventId] = useState<number | null>(null);
+  const [scannerMsg, setScannerMsg] = useState("");
+
+  const loadScanners = async (eventId: number) => {
+    try {
+      const data = await apiClient.get<AssignedScanner[]>(`/scanner/event/${eventId}/scanners`);
+      setScannersByEvent((prev) => ({ ...prev, [eventId]: data }));
+    } catch { /* silent */ }
+  };
+
+  const handleAssignScanner = async (eventId: number) => {
+    if (!scannerEmail.trim()) return;
+    setScannerMsg("");
+    try {
+      await apiClient.post("/scanner/assign", { eventId, scannerEmail: scannerEmail.trim() });
+      setScannerEmail("");
+      setScannerEventId(null);
+      setScannerMsg("Escaneador asignado correctamente");
+      loadScanners(eventId);
+    } catch (err: any) {
+      setScannerMsg(err?.message || "Error al asignar escaneador");
+    }
+  };
+
+  const handleRemoveScanner = async (eventId: number, scannerId: number) => {
+    try {
+      await apiClient.delete(`/scanner/event/${eventId}/scanner/${scannerId}`);
+      loadScanners(eventId);
+    } catch { /* silent */ }
+  };
+
+  const toggleScannerPanel = (eventId: number) => {
+    if (scannerEventId === eventId) {
+      setScannerEventId(null);
+    } else {
+      setScannerEventId(eventId);
+      if (!scannersByEvent[eventId]) loadScanners(eventId);
+    }
+    setScannerMsg("");
   };
 
   const handleDelete = async (id: number) => {
@@ -238,6 +289,16 @@ export default function DashboardPage() {
                         Editar
                       </Link>
                       <button
+                        onClick={() => toggleScannerPanel(event.id)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          scannerEventId === event.id
+                            ? "bg-indigo-600 text-white"
+                            : "bg-neutral-800 text-gray-300 hover:bg-neutral-700"
+                        }`}
+                      >
+                        Scanners
+                      </button>
+                      <button
                         onClick={() => handleDelete(event.id)}
                         className="px-4 py-2 bg-red-900/50 text-red-300 rounded-lg text-sm font-medium hover:bg-red-900 transition-colors"
                       >
@@ -252,6 +313,71 @@ export default function DashboardPage() {
                     Ver
                   </Link>
                 </div>
+
+                {scannerEventId === event.id && (
+                  <div className="w-full mt-4 pt-4 border-t border-neutral-700">
+                    <h4 className="text-sm font-semibold text-gray-300 mb-3">
+                      Escaneadores asignados
+                    </h4>
+
+                    {scannersByEvent[event.id]?.length ? (
+                      <div className="space-y-2 mb-4">
+                        {scannersByEvent[event.id].map((s) => (
+                          <div
+                            key={s.id}
+                            className="flex items-center justify-between bg-neutral-800 rounded-lg px-4 py-2"
+                          >
+                            <div>
+                              <p className="text-sm text-white">{s.name}</p>
+                              <p className="text-xs text-gray-400">{s.email}</p>
+                            </div>
+                            <button
+                              onClick={() => handleRemoveScanner(event.id, s.id)}
+                              className="text-red-400 hover:text-red-300 text-xs"
+                            >
+                              Remover
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 text-sm mb-4">
+                        No hay escaneadores asignados
+                      </p>
+                    )}
+
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        value={scannerEmail}
+                        onChange={(e) => setScannerEmail(e.target.value)}
+                        placeholder="Email del escaneador"
+                        className="flex-grow bg-neutral-800 text-white border border-neutral-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") handleAssignScanner(event.id);
+                        }}
+                      />
+                      <button
+                        onClick={() => handleAssignScanner(event.id)}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
+                      >
+                        Asignar
+                      </button>
+                    </div>
+
+                    {scannerMsg && (
+                      <p
+                        className={`mt-2 text-xs ${
+                          scannerMsg.includes("Error") || scannerMsg.includes("error")
+                            ? "text-red-400"
+                            : "text-green-400"
+                        }`}
+                      >
+                        {scannerMsg}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
