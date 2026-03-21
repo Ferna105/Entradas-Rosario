@@ -3,6 +3,7 @@ export interface User {
   name: string;
   email: string;
   type: 'buyer' | 'seller' | 'admin' | 'scanner';
+  mpConnected?: boolean;
 }
 
 export interface AuthResponse {

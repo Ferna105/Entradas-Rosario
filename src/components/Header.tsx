@@ -50,6 +50,15 @@ export default function Header() {
                       {user.type === "seller" ? "Organizador" : user.type === "buyer" ? "Comprador" : user.type}
                     </p>
                   </div>
+                  {(user.type === "seller" || user.type === "admin") && (
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setMenuOpen(false)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Mis Eventos
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       logout();
