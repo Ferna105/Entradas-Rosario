@@ -11,6 +11,12 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
+  private getAuthHeader(): Record<string, string> {
+    if (typeof window === 'undefined') return {};
+    const token = localStorage.getItem('accessToken');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
   private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const { params, ...fetchOptions } = options;
     
@@ -22,6 +28,7 @@ class ApiClient {
 
     const defaultHeaders = {
       'Content-Type': 'application/json',
+      ...this.getAuthHeader(),
     };
 
     const response = await fetch(url, {
@@ -33,7 +40,8 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
+      const error = await response.json().catch(() => ({ message: response.statusText }));
+      throw new Error(error.message || `API Error: ${response.statusText}`);
     }
 
     return response.json();
@@ -64,4 +72,4 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(API_URL || ''); 
+export const apiClient = new ApiClient(API_URL || '');
