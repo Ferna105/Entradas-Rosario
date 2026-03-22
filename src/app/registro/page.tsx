@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { Button, Card, Input, Label, PageContainer } from "@/components/ui";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -36,166 +37,140 @@ export default function RegisterPage() {
       await register(name, email, password, type);
       router.push("/");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error al crear la cuenta"
-      );
+      setError(err instanceof Error ? err.message : "Error al crear la cuenta");
     } finally {
       setLoading(false);
     }
   };
 
+  const pill =
+    "min-h-[44px] flex-1 rounded-xl border px-3 py-2.5 text-center text-xs font-semibold transition-colors sm:text-sm";
+  const pillActive = "border-violet-500 bg-violet-600/25 text-violet-200 ring-1 ring-violet-500/40";
+  const pillIdle =
+    "border-white/10 bg-zinc-950/50 text-zinc-400 hover:border-white/20 hover:text-zinc-200";
+
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
+    <PageContainer className="flex min-h-[80vh] flex-col items-center justify-center py-8 sm:py-10">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-gray-900 text-center mb-2">
-            Crear Cuenta
+        <Card className="p-6 sm:p-8">
+          <h1 className="mb-2 text-center text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">
+            Crear cuenta
           </h1>
-          <p className="text-gray-500 text-center mb-8">
+          <p className="mb-8 text-center text-sm text-zinc-500">
             Registrate en Entradas Rosario
           </p>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+            <div
+              className="mb-6 rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-300"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-semibold text-gray-900 mb-1"
-              >
+              <Label htmlFor="name" className="mb-1.5">
                 Nombre completo
-              </label>
-              <input
+              </Label>
+              <Input
                 type="text"
                 id="name"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                 placeholder="Tu nombre"
+                autoComplete="name"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold text-gray-900 mb-1"
-              >
+              <Label htmlFor="email" className="mb-1.5">
                 Email
-              </label>
-              <input
+              </Label>
+              <Input
                 type="email"
                 id="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                 placeholder="tucorreo@email.com"
+                autoComplete="email"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold text-gray-900 mb-1"
-              >
+              <Label htmlFor="password" className="mb-1.5">
                 Contraseña
-              </label>
-              <input
+              </Label>
+              <Input
                 type="password"
                 id="password"
                 required
                 minLength={6}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                 placeholder="Mínimo 6 caracteres"
+                autoComplete="new-password"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-semibold text-gray-900 mb-1"
-              >
+              <Label htmlFor="confirmPassword" className="mb-1.5">
                 Confirmar contraseña
-              </label>
-              <input
+              </Label>
+              <Input
                 type="password"
                 id="confirmPassword"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                 placeholder="Repetí tu contraseña"
+                autoComplete="new-password"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Tipo de cuenta
-              </label>
-              <div className="grid grid-cols-3 gap-3">
+              <p className="mb-2 text-sm font-medium text-zinc-300">Tipo de cuenta</p>
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
                   onClick={() => setType("buyer")}
-                  className={`py-3 px-4 rounded-lg border-2 text-sm font-medium transition-colors ${
-                    type === "buyer"
-                      ? "border-black bg-black text-white"
-                      : "border-gray-300 text-gray-700 hover:border-gray-400"
-                  }`}
+                  className={`${pill} ${type === "buyer" ? pillActive : pillIdle}`}
                 >
                   Comprador
                 </button>
                 <button
                   type="button"
                   onClick={() => setType("seller")}
-                  className={`py-3 px-4 rounded-lg border-2 text-sm font-medium transition-colors ${
-                    type === "seller"
-                      ? "border-black bg-black text-white"
-                      : "border-gray-300 text-gray-700 hover:border-gray-400"
-                  }`}
+                  className={`${pill} ${type === "seller" ? pillActive : pillIdle}`}
                 >
                   Organizador
                 </button>
                 <button
                   type="button"
                   onClick={() => setType("scanner")}
-                  className={`py-3 px-4 rounded-lg border-2 text-sm font-medium transition-colors ${
-                    type === "scanner"
-                      ? "border-black bg-black text-white"
-                      : "border-gray-300 text-gray-700 hover:border-gray-400"
-                  }`}
+                  className={`${pill} ${type === "scanner" ? pillActive : pillIdle}`}
                 >
                   Escaneador
                 </button>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Creando cuenta..." : "Crear cuenta"}
-            </button>
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Creando cuenta…" : "Crear cuenta"}
+            </Button>
           </form>
 
-          <p className="mt-6 text-center text-gray-600 text-sm">
+          <p className="mt-6 text-center text-sm text-zinc-500">
             ¿Ya tenés cuenta?{" "}
-            <Link
-              href="/login"
-              className="text-black font-semibold hover:underline"
-            >
+            <Link href="/login" className="font-semibold text-violet-400 hover:text-violet-300">
               Iniciá sesión
             </Link>
           </p>
-        </div>
+        </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }

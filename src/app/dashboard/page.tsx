@@ -8,6 +8,7 @@ import { Event } from "@/types/event";
 import { eventsService } from "@/services/events";
 import { mpService } from "@/services/mercadopago";
 import { apiClient } from "@/services/api";
+import { Button, Card, Input, PageContainer } from "@/components/ui";
 
 interface AssignedScanner {
   id: number;
@@ -25,10 +26,10 @@ const formatDate = (dateString: string) => {
 };
 
 const statusLabel: Record<string, { text: string; color: string }> = {
-  published: { text: "Publicado", color: "bg-green-100 text-green-800" },
-  draft: { text: "Borrador", color: "bg-gray-100 text-gray-800" },
-  cancelled: { text: "Cancelado", color: "bg-red-100 text-red-800" },
-  finished: { text: "Finalizado", color: "bg-blue-100 text-blue-800" },
+  published: { text: "Publicado", color: "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/25" },
+  draft: { text: "Borrador", color: "bg-zinc-500/15 text-zinc-300 ring-1 ring-white/10" },
+  cancelled: { text: "Cancelado", color: "bg-red-500/15 text-red-300 ring-1 ring-red-500/25" },
+  finished: { text: "Finalizado", color: "bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/25" },
 };
 
 function DashboardPageContent() {
@@ -161,45 +162,42 @@ function DashboardPageContent() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-gray-400">Cargando...</p>
+      <div className="flex min-h-[80vh] items-center justify-center px-4">
+        <p className="text-sm text-zinc-500">Cargando…</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* MercadoPago Section */}
-      <div className="bg-neutral-900 rounded-xl p-6 mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <PageContainer className="flex flex-col gap-8 py-6 sm:py-10">
+      {/* MercadoPago — primero en móvil y desktop */}
+      <Card className="p-5 sm:p-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white mb-1">MercadoPago</h2>
+            <h2 className="mb-1 text-lg font-bold text-white sm:text-xl">MercadoPago</h2>
             {mpStatus.connected ? (
-              <p className="text-green-400 text-sm">
+              <p className="text-sm text-emerald-400">
                 Cuenta vinculada (ID: {mpStatus.mpUserId})
               </p>
             ) : (
-              <p className="text-gray-400 text-sm">
-                Vinculá tu cuenta de MercadoPago para recibir los pagos de tus
-                eventos
+              <p className="text-sm text-zinc-400">
+                Vinculá tu cuenta de MercadoPago para recibir los pagos de tus eventos
               </p>
             )}
           </div>
-          <div className="flex gap-3">
+          <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
             {mpStatus.connected ? (
-              <button
-                onClick={handleDisconnectMp}
-                className="px-5 py-2.5 bg-red-900/50 text-red-300 rounded-lg text-sm font-medium hover:bg-red-900 transition-colors"
-              >
+              <Button type="button" variant="danger" onClick={handleDisconnectMp} className="w-full sm:w-auto">
                 Desvincular
-              </button>
+              </Button>
             ) : (
               <button
+                type="button"
                 onClick={handleConnectMp}
                 disabled={mpLoading}
-                className="px-5 py-2.5 bg-[#009EE3] text-white rounded-lg text-sm font-semibold hover:bg-[#0087C9] transition-colors disabled:opacity-50"
+                className="min-h-[44px] rounded-xl bg-[#009EE3] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#0087C9] disabled:opacity-50"
               >
-                {mpLoading ? "Conectando..." : "Vincular MercadoPago"}
+                {mpLoading ? "Conectando…" : "Vincular MercadoPago"}
               </button>
             )}
           </div>
@@ -209,182 +207,184 @@ function DashboardPageContent() {
             className={`mt-3 text-sm ${
               mpMessage.includes("Error") || mpMessage.includes("error")
                 ? "text-red-400"
-                : "text-green-400"
+                : "text-emerald-400"
             }`}
           >
             {mpMessage}
           </p>
         )}
-      </div>
+      </Card>
 
-      {/* Events Section */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">Mis Eventos</h1>
-          <p className="text-gray-400 mt-1">
-            Gestioná tus eventos como organizador
-          </p>
+          <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">
+            Mis eventos
+          </h1>
+          <p className="mt-1 text-sm text-zinc-400">Gestioná tus eventos como organizador</p>
         </div>
         <Link
           href="/eventos/crear"
-          className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-violet-600 px-5 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 sm:w-auto"
         >
-          + Crear Evento
+          + Crear evento
         </Link>
       </div>
 
       {error && (
-        <div className="bg-red-900/30 border border-red-700 text-red-300 px-4 py-3 rounded-lg mb-6">
+        <div
+          className="rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-300"
+          role="alert"
+        >
           {error}
         </div>
       )}
 
       {events.length === 0 ? (
-        <div className="bg-neutral-900 rounded-xl p-12 text-center">
-          <p className="text-gray-400 text-lg mb-4">
+        <Card className="p-10 text-center sm:p-12">
+          <p className="mb-4 text-base text-zinc-400 sm:text-lg">
             Todavía no tenés eventos creados
           </p>
           <Link
             href="/eventos/crear"
-            className="inline-block bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-violet-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-violet-500"
           >
             Crear mi primer evento
           </Link>
-        </div>
+        </Card>
       ) : (
         <div className="grid gap-4">
           {events.map((event) => {
             const status = statusLabel[event.status] || statusLabel.draft;
             return (
-              <div
-                key={event.id}
-                className="bg-neutral-900 rounded-xl p-6 flex flex-col md:flex-row md:items-center gap-4"
-              >
-                <div className="flex-grow min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-lg font-semibold text-white truncate">
-                      {event.name}
-                    </h3>
-                    <span
-                      className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${status.color}`}
-                    >
-                      {status.text}
-                    </span>
+              <Card key={event.id} className="p-5 sm:p-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      <h3 className="text-lg font-semibold text-white">{event.name}</h3>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${status.color}`}
+                      >
+                        {status.text}
+                      </span>
+                    </div>
+                    <p className="text-sm text-zinc-400">
+                      {formatDate(event.event_date)} · {event.location}
+                    </p>
+                    <p className="mt-1 text-sm text-zinc-500">
+                      ${Number(event.price).toLocaleString("es-AR")} · Capacidad: {event.capacity}
+                    </p>
                   </div>
-                  <p className="text-gray-400 text-sm">
-                    {formatDate(event.event_date)} &middot; {event.location}
-                  </p>
-                  <p className="text-gray-500 text-sm mt-1">
-                    ${Number(event.price).toLocaleString("es-AR")} &middot;{" "}
-                    Capacidad: {event.capacity}
-                  </p>
-                </div>
 
-                <div className="flex gap-2 shrink-0">
-                  {event.status !== "cancelled" && (
-                    <>
-                      <Link
-                        href={`/eventos/editar/${event.id}`}
-                        className="px-4 py-2 bg-neutral-800 text-white rounded-lg text-sm font-medium hover:bg-neutral-700 transition-colors"
-                      >
-                        Editar
-                      </Link>
-                      <button
-                        onClick={() => toggleScannerPanel(event.id)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          scannerEventId === event.id
-                            ? "bg-indigo-600 text-white"
-                            : "bg-neutral-800 text-gray-300 hover:bg-neutral-700"
-                        }`}
-                      >
-                        Scanners
-                      </button>
-                      <button
-                        onClick={() => handleDelete(event.id)}
-                        className="px-4 py-2 bg-red-900/50 text-red-300 rounded-lg text-sm font-medium hover:bg-red-900 transition-colors"
-                      >
-                        Cancelar
-                      </button>
-                    </>
-                  )}
-                  <Link
-                    href={`/eventos/${event.id}`}
-                    className="px-4 py-2 bg-neutral-800 text-gray-300 rounded-lg text-sm font-medium hover:bg-neutral-700 transition-colors"
-                  >
-                    Ver
-                  </Link>
+                  <div className="flex w-full shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap md:w-auto md:justify-end">
+                    {event.status !== "cancelled" && (
+                      <>
+                        <Link
+                          href={`/eventos/editar/${event.id}`}
+                          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/10 bg-zinc-800/80 px-4 py-2 text-center text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+                        >
+                          Editar
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => toggleScannerPanel(event.id)}
+                          className={`inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                            scannerEventId === event.id
+                              ? "bg-violet-600 text-white"
+                              : "border border-white/10 bg-zinc-800/80 text-zinc-200 hover:bg-zinc-800"
+                          }`}
+                        >
+                          Scanners
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(event.id)}
+                          className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-2 text-sm font-medium text-red-300 transition-colors hover:bg-red-950/60"
+                        >
+                          Cancelar
+                        </button>
+                      </>
+                    )}
+                    <Link
+                      href={`/eventos/${event.id}`}
+                      className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-white/10 bg-zinc-800/80 px-4 py-2 text-center text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800"
+                    >
+                      Ver
+                    </Link>
+                  </div>
                 </div>
 
                 {scannerEventId === event.id && (
-                  <div className="w-full mt-4 pt-4 border-t border-neutral-700">
-                    <h4 className="text-sm font-semibold text-gray-300 mb-3">
-                      Escaneadores asignados
-                    </h4>
+                  <div className="mt-4 w-full border-t border-white/10 pt-4">
+                    <Card className="border-white/5 bg-zinc-950/40 p-4">
+                      <h4 className="mb-3 text-sm font-semibold text-zinc-200">
+                        Escaneadores asignados
+                      </h4>
 
-                    {scannersByEvent[event.id]?.length ? (
-                      <div className="space-y-2 mb-4">
-                        {scannersByEvent[event.id].map((s) => (
-                          <div
-                            key={s.id}
-                            className="flex items-center justify-between bg-neutral-800 rounded-lg px-4 py-2"
-                          >
-                            <div>
-                              <p className="text-sm text-white">{s.name}</p>
-                              <p className="text-xs text-gray-400">{s.email}</p>
-                            </div>
-                            <button
-                              onClick={() => handleRemoveScanner(event.id, s.id)}
-                              className="text-red-400 hover:text-red-300 text-xs"
+                      {scannersByEvent[event.id]?.length ? (
+                        <div className="mb-4 space-y-2">
+                          {scannersByEvent[event.id].map((s) => (
+                            <div
+                              key={s.id}
+                              className="flex items-center justify-between gap-2 rounded-xl border border-white/5 bg-zinc-900/80 px-4 py-3"
                             >
-                              Remover
-                            </button>
-                          </div>
-                        ))}
+                              <div className="min-w-0">
+                                <p className="truncate text-sm text-white">{s.name}</p>
+                                <p className="truncate text-xs text-zinc-500">{s.email}</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveScanner(event.id, s.id)}
+                                className="shrink-0 text-xs text-red-400 hover:text-red-300"
+                              >
+                                Remover
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mb-4 text-sm text-zinc-500">No hay escaneadores asignados</p>
+                      )}
+
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        <Input
+                          type="email"
+                          value={scannerEmail}
+                          onChange={(e) => setScannerEmail(e.target.value)}
+                          placeholder="Email del escaneador"
+                          className="flex-1"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") handleAssignScanner(event.id);
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          onClick={() => handleAssignScanner(event.id)}
+                          className="w-full shrink-0 sm:w-auto"
+                        >
+                          Asignar
+                        </Button>
                       </div>
-                    ) : (
-                      <p className="text-gray-500 text-sm mb-4">
-                        No hay escaneadores asignados
-                      </p>
-                    )}
 
-                    <div className="flex gap-2">
-                      <input
-                        type="email"
-                        value={scannerEmail}
-                        onChange={(e) => setScannerEmail(e.target.value)}
-                        placeholder="Email del escaneador"
-                        className="flex-grow bg-neutral-800 text-white border border-neutral-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") handleAssignScanner(event.id);
-                        }}
-                      />
-                      <button
-                        onClick={() => handleAssignScanner(event.id)}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors"
-                      >
-                        Asignar
-                      </button>
-                    </div>
-
-                    {scannerMsg && (
-                      <p
-                        className={`mt-2 text-xs ${
-                          scannerMsg.includes("Error") || scannerMsg.includes("error")
-                            ? "text-red-400"
-                            : "text-green-400"
-                        }`}
-                      >
-                        {scannerMsg}
-                      </p>
-                    )}
+                      {scannerMsg && (
+                        <p
+                          className={`mt-2 text-xs ${
+                            scannerMsg.includes("Error") || scannerMsg.includes("error")
+                              ? "text-red-400"
+                              : "text-emerald-400"
+                          }`}
+                        >
+                          {scannerMsg}
+                        </p>
+                      )}
+                    </Card>
                   </div>
                 )}
-              </div>
+              </Card>
             );
           })}
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }
 
@@ -392,8 +392,8 @@ export default function DashboardPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-[80vh] flex items-center justify-center">
-          <p className="text-gray-400">Cargando...</p>
+        <div className="flex min-h-[80vh] items-center justify-center px-4">
+          <p className="text-sm text-zinc-500">Cargando…</p>
         </div>
       }
     >

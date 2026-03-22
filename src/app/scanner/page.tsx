@@ -10,6 +10,7 @@ import {
   EventStats,
 } from "@/services/scanner";
 import { Html5Qrcode } from "html5-qrcode";
+import { Card, PageContainer } from "@/components/ui";
 
 export default function ScannerPage() {
   const { user, loading: authLoading } = useAuth();
@@ -145,49 +146,51 @@ export default function ScannerPage() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-gray-400">Cargando...</p>
-      </div>
+      <PageContainer className="flex min-h-[80vh] items-center justify-center py-10">
+        <p className="text-sm text-zinc-500">Cargando…</p>
+      </PageContainer>
     );
   }
 
   if (!selectedEvent) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Escáner de Entradas
+      <PageContainer className="max-w-lg py-6 sm:py-8">
+        <h1 className="mb-2 text-xl font-bold tracking-tight text-white sm:text-2xl">
+          Escáner de entradas
         </h1>
-        <p className="text-gray-500 mb-6">
+        <p className="mb-6 text-sm text-zinc-400">
           Hola {user.name}, seleccioná un evento para escanear entradas.
         </p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-            <p className="text-red-700 text-sm">{error}</p>
+          <div
+            className="mb-4 rounded-xl border border-red-500/30 bg-red-950/40 p-4"
+            role="alert"
+          >
+            <p className="text-sm text-red-300">{error}</p>
           </div>
         )}
 
         {loadingEvents ? (
-          <p className="text-gray-400 text-center py-10">
-            Cargando eventos...
-          </p>
+          <p className="py-10 text-center text-sm text-zinc-500">Cargando eventos…</p>
         ) : events.length === 0 ? (
-          <div className="text-center py-10 bg-gray-50 rounded-xl">
-            <p className="text-gray-500">No tenés eventos asignados</p>
-            <p className="text-gray-400 text-sm mt-2">
+          <Card className="p-8 text-center">
+            <p className="text-zinc-400">No tenés eventos asignados</p>
+            <p className="mt-2 text-sm text-zinc-500">
               Pedile al organizador que te asigne a un evento
             </p>
-          </div>
+          </Card>
         ) : (
           <div className="space-y-3">
             {events.map((event) => (
               <button
                 key={event.id}
+                type="button"
                 onClick={() => selectEvent(event)}
-                className="w-full text-left bg-white border border-gray-200 rounded-xl p-4 hover:border-indigo-400 hover:shadow-md transition-all"
+                className="w-full rounded-2xl border border-white/10 bg-zinc-900/80 p-4 text-left transition-colors hover:border-violet-500/40 hover:bg-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
               >
-                <p className="font-semibold text-gray-900">{event.name}</p>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="font-semibold text-white">{event.name}</p>
+                <p className="mt-1 text-sm text-zinc-500">
                   {new Date(event.event_date).toLocaleDateString("es-AR", {
                     day: "numeric",
                     month: "long",
@@ -196,20 +199,21 @@ export default function ScannerPage() {
                     minute: "2-digit",
                   })}
                 </p>
-                <p className="text-sm text-gray-400">{event.location}</p>
+                <p className="text-sm text-zinc-600">{event.location}</p>
               </button>
             ))}
           </div>
         )}
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6">
+    <PageContainer className="max-w-lg py-4 sm:py-6">
       <button
+        type="button"
         onClick={backToEvents}
-        className="flex items-center text-gray-500 hover:text-gray-700 mb-4"
+        className="mb-4 flex min-h-[44px] items-center text-sm text-zinc-400 transition-colors hover:text-white"
       >
         <svg
           className="w-5 h-5 mr-1"
@@ -227,10 +231,10 @@ export default function ScannerPage() {
         Volver a eventos
       </button>
 
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4">
-          <h2 className="text-white font-bold text-lg">{selectedEvent.name}</h2>
-          <p className="text-indigo-100 text-sm">
+      <Card className="overflow-hidden p-0">
+        <div className="sticky top-[52px] z-10 border-b border-white/10 bg-gradient-to-r from-violet-700 to-violet-600 p-4 sm:relative sm:top-0">
+          <h2 className="text-lg font-bold text-white">{selectedEvent.name}</h2>
+          <p className="text-sm text-violet-100/90">
             {new Date(selectedEvent.event_date).toLocaleDateString("es-AR", {
               day: "numeric",
               month: "long",
@@ -241,20 +245,18 @@ export default function ScannerPage() {
         </div>
 
         {stats && (
-          <div className="grid grid-cols-3 gap-2 p-4 bg-gray-50">
+          <div className="grid grid-cols-3 gap-2 border-b border-white/10 bg-zinc-950/50 p-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-indigo-600">
-                {stats.scanned}
-              </p>
-              <p className="text-xs text-gray-500">Ingresaron</p>
+              <p className="text-2xl font-bold text-violet-400">{stats.scanned}</p>
+              <p className="text-xs text-zinc-500">Ingresaron</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">{stats.valid}</p>
-              <p className="text-xs text-gray-500">Pendientes</p>
+              <p className="text-2xl font-bold text-emerald-400">{stats.valid}</p>
+              <p className="text-xs text-zinc-500">Pendientes</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold text-gray-600">{stats.total}</p>
-              <p className="text-xs text-gray-500">Total</p>
+              <p className="text-2xl font-bold text-zinc-300">{stats.total}</p>
+              <p className="text-xs text-zinc-500">Total</p>
             </div>
           </div>
         )}
@@ -262,20 +264,20 @@ export default function ScannerPage() {
         <div className="p-4">
           {scanResult && (
             <div
-              className={`mb-4 rounded-xl p-6 text-center ${
+              className={`mb-4 rounded-2xl border-2 p-6 text-center ${
                 scanResult.valid
-                  ? "bg-green-50 border-2 border-green-400"
-                  : "bg-red-50 border-2 border-red-400"
+                  ? "border-emerald-500/50 bg-emerald-950/40"
+                  : "border-red-500/50 bg-red-950/40"
               }`}
             >
               <div
-                className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 ${
-                  scanResult.valid ? "bg-green-100" : "bg-red-100"
+                className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full ${
+                  scanResult.valid ? "bg-emerald-500/20" : "bg-red-500/20"
                 }`}
               >
                 {scanResult.valid ? (
                   <svg
-                    className="w-8 h-8 text-green-600"
+                    className="h-8 w-8 text-emerald-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -289,7 +291,7 @@ export default function ScannerPage() {
                   </svg>
                 ) : (
                   <svg
-                    className="w-8 h-8 text-red-600"
+                    className="h-8 w-8 text-red-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -306,28 +308,24 @@ export default function ScannerPage() {
 
               <p
                 className={`text-lg font-bold ${
-                  scanResult.valid ? "text-green-700" : "text-red-700"
+                  scanResult.valid ? "text-emerald-300" : "text-red-300"
                 }`}
               >
                 {scanResult.valid ? "ACCESO PERMITIDO" : "ACCESO DENEGADO"}
               </p>
               <p
-                className={`text-sm mt-1 ${
-                  scanResult.valid ? "text-green-600" : "text-red-600"
+                className={`mt-1 text-sm ${
+                  scanResult.valid ? "text-emerald-400/90" : "text-red-400/90"
                 }`}
               >
                 {scanResult.message}
               </p>
 
               {scanResult.ticket && (
-                <div className="mt-3 pt-3 border-t border-gray-200">
-                  <p className="text-gray-700 text-sm">
-                    {scanResult.ticket.buyerName}
-                  </p>
+                <div className="mt-3 border-t border-white/10 pt-3">
+                  <p className="text-sm text-zinc-200">{scanResult.ticket.buyerName}</p>
                   {scanResult.ticket.buyerEmail && (
-                    <p className="text-gray-400 text-xs">
-                      {scanResult.ticket.buyerEmail}
-                    </p>
+                    <p className="text-xs text-zinc-500">{scanResult.ticket.buyerEmail}</p>
                   )}
                 </div>
               )}
@@ -344,8 +342,9 @@ export default function ScannerPage() {
 
           {!scanning ? (
             <button
+              type="button"
               onClick={startCamera}
-              className="w-full bg-indigo-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
+              className="flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 text-lg font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
             >
               <svg
                 className="w-6 h-6"
@@ -370,14 +369,15 @@ export default function ScannerPage() {
             </button>
           ) : (
             <button
+              type="button"
               onClick={stopCamera}
-              className="w-full bg-gray-600 text-white py-3 rounded-xl font-semibold mt-3 hover:bg-gray-700 transition-colors"
+              className="mt-3 w-full min-h-[44px] rounded-xl border border-white/15 bg-zinc-800 py-3 font-semibold text-zinc-100 transition-colors hover:bg-zinc-700"
             >
               Detener cámara
             </button>
           )}
         </div>
-      </div>
-    </div>
+      </Card>
+    </PageContainer>
   );
 }

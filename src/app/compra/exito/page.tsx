@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiClient } from "@/services/api";
+import { Card, PageContainer } from "@/components/ui";
 
 interface TicketInfo {
   id: number;
@@ -56,19 +57,19 @@ function CompraExitoContent() {
 
   if (loading) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-gray-400">Cargando...</p>
-      </div>
+      <PageContainer className="flex min-h-[80vh] items-center justify-center py-10">
+        <p className="text-sm text-zinc-500">Cargando…</p>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-2xl">
-        <div className="bg-white rounded-2xl shadow-xl p-10 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+    <PageContainer className="flex min-h-[80vh] flex-col items-center justify-center py-10">
+      <div className="w-full max-w-2xl text-center">
+        <Card className="p-8 sm:p-10">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15 ring-1 ring-emerald-500/30">
             <svg
-              className="w-10 h-10 text-green-600"
+              className="h-10 w-10 text-emerald-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -82,17 +83,17 @@ function CompraExitoContent() {
             </svg>
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+          <h1 className="mb-3 text-xl font-bold text-white sm:text-2xl md:text-3xl">
             ¡Compra exitosa!
           </h1>
 
           {purchase ? (
             <>
-              <div className="text-left bg-gray-50 rounded-lg p-5 mt-6 space-y-2">
-                <p className="text-gray-900 font-semibold text-lg">
+              <div className="mt-6 space-y-2 rounded-xl border border-white/10 bg-zinc-950/50 p-5 text-left">
+                <p className="text-lg font-semibold text-white">
                   {purchase.event.name}
                 </p>
-                <p className="text-gray-600 text-sm">
+                <p className="text-sm text-zinc-400">
                   {new Date(purchase.event.event_date).toLocaleDateString(
                     "es-AR",
                     {
@@ -104,18 +105,16 @@ function CompraExitoContent() {
                     }
                   )}
                 </p>
-                <p className="text-gray-600 text-sm">
-                  {purchase.event.location}
-                </p>
-                <div className="border-t border-gray-200 pt-2 mt-2">
-                  <p className="text-gray-700 text-sm">
+                <p className="text-sm text-zinc-400">{purchase.event.location}</p>
+                <div className="mt-2 border-t border-white/10 pt-2">
+                  <p className="text-sm text-zinc-300">
                     Comprador: {purchase.buyer_name}
                   </p>
-                  <p className="text-gray-700 text-sm">
+                  <p className="text-sm text-zinc-300">
                     Cantidad: {purchase.quantity}{" "}
                     {purchase.quantity === 1 ? "entrada" : "entradas"}
                   </p>
-                  <p className="text-gray-900 font-semibold mt-1">
+                  <p className="mt-1 font-semibold text-violet-400">
                     Total: $
                     {Number(purchase.total_amount).toLocaleString("es-AR")}
                   </p>
@@ -123,23 +122,23 @@ function CompraExitoContent() {
               </div>
 
               {purchase.tickets && purchase.tickets.length > 0 && (
-                <div className="mt-8">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">
+                <div className="mt-8 text-left">
+                  <h2 className="mb-4 text-lg font-bold text-white sm:text-xl">
                     {purchase.tickets.length > 1
                       ? `Tus ${purchase.tickets.length} entradas`
                       : "Tu entrada"}
                   </h2>
-                  <p className="text-gray-500 text-sm mb-6">
+                  <p className="mb-6 text-sm text-zinc-500">
                     Presentá {purchase.tickets.length > 1 ? "estos códigos QR" : "este código QR"} en la entrada del evento
                   </p>
 
-                  <div className="grid gap-6">
+                  <div className="grid grid-cols-1 gap-6">
                     {purchase.tickets.map((ticket, index) => (
                       <div
                         key={ticket.id}
-                        className="border-2 border-gray-200 rounded-xl p-6 bg-white"
+                        className="rounded-2xl border border-white/10 bg-zinc-950/40 p-6"
                       >
-                        <p className="text-gray-500 text-sm mb-3">
+                        <p className="mb-3 text-sm text-zinc-500">
                           Entrada {index + 1} de {purchase.tickets.length}
                         </p>
                         {ticket.qr_code && (
@@ -148,20 +147,20 @@ function CompraExitoContent() {
                             <img
                               src={ticket.qr_code}
                               alt={`QR Entrada ${index + 1}`}
-                              className="w-64 h-64 mx-auto"
+                              className="mx-auto h-56 w-56 max-w-full sm:h-64 sm:w-64"
                             />
                           </>
                         )}
-                        <p className="text-xs text-gray-400 mt-3 font-mono break-all">
+                        <p className="mt-3 break-all font-mono text-xs text-zinc-500">
                           {ticket.qr_data}
                         </p>
                         <span
-                          className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-medium ${
+                          className={`mt-3 inline-block rounded-full px-3 py-1 text-xs font-medium ${
                             ticket.status === "valid"
-                              ? "bg-green-100 text-green-700"
+                              ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/25"
                               : ticket.status === "used"
-                              ? "bg-gray-100 text-gray-600"
-                              : "bg-red-100 text-red-700"
+                              ? "bg-zinc-500/15 text-zinc-400 ring-1 ring-white/10"
+                              : "bg-red-500/15 text-red-300 ring-1 ring-red-500/25"
                           }`}
                         >
                           {ticket.status === "valid"
@@ -176,19 +175,19 @@ function CompraExitoContent() {
                 </div>
               )}
 
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-6 text-left">
-                <p className="text-amber-800 text-sm">
-                  <strong>Importante:</strong> También recibirás{" "}
+              <div className="mt-6 rounded-xl border border-amber-500/25 bg-amber-950/30 p-4 text-left">
+                <p className="text-sm text-amber-200/90">
+                  <strong className="text-amber-100">Importante:</strong> También recibirás{" "}
                   {purchase.tickets?.length > 1
                     ? "tus entradas"
                     : "tu entrada"}{" "}
-                  por email a <strong>{purchase.buyer_email}</strong>. Cada QR es
+                  por email a <strong className="text-white">{purchase.buyer_email}</strong>. Cada QR es
                   de uso único y será escaneado al ingresar al evento.
                 </p>
               </div>
             </>
           ) : (
-            <p className="text-gray-600 mt-4">
+            <p className="mt-4 text-zinc-400">
               Tu compra fue procesada correctamente. Pronto recibirás un email
               con tus entradas.
             </p>
@@ -196,13 +195,13 @@ function CompraExitoContent() {
 
           <Link
             href="/"
-            className="inline-block mt-8 bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+            className="mt-8 inline-flex min-h-[44px] items-center justify-center rounded-xl bg-violet-600 px-8 py-3 font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           >
             Volver al inicio
           </Link>
-        </div>
+        </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }
 
@@ -210,9 +209,9 @@ export default function CompraExitoPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-[80vh] flex items-center justify-center">
-          <p className="text-gray-400">Cargando...</p>
-        </div>
+        <PageContainer className="flex min-h-[80vh] items-center justify-center py-10">
+          <p className="text-sm text-zinc-500">Cargando…</p>
+        </PageContainer>
       }
     >
       <CompraExitoContent />

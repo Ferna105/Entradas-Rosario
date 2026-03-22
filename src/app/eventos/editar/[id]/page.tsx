@@ -45,16 +45,16 @@ export default function EditEventPage({
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-gray-400">Cargando...</p>
+      <div className="flex min-h-[80vh] items-center justify-center px-4">
+        <p className="text-sm text-zinc-500">Cargando…</p>
       </div>
     );
   }
 
   if (error || !event) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-red-400">{error || "Evento no encontrado"}</p>
+      <div className="flex min-h-[80vh] items-center justify-center px-4">
+        <p className="text-center text-red-400">{error || "Evento no encontrado"}</p>
       </div>
     );
   }

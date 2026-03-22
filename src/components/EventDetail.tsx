@@ -4,6 +4,7 @@ import { FC, useState } from "react";
 import Image from "next/image";
 import { Event } from "@/types/event";
 import { eventsService } from "@/services/events";
+import { Button, Card, Input, Label, PageContainer } from "@/components/ui";
 
 interface EventDetailProps {
   event: Event;
@@ -43,9 +44,9 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setBuyerInfo(prev => ({
+    setBuyerInfo((prev) => ({
       ...prev,
-      [name]: name === 'quantity' ? parseInt(value) || 1 : value
+      [name]: name === "quantity" ? parseInt(value, 10) || 1 : value,
     }));
   };
 
@@ -58,8 +59,8 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
         buyerName: buyerInfo.name,
         quantity: buyerInfo.quantity,
       });
-      
-      window.location.href = initPoint; // Redirige a la URL de pago de MercadoPago
+
+      window.location.href = initPoint;
     } catch (error) {
       console.error("Error:", error);
       alert(
@@ -71,112 +72,138 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <Image
-          width={1000}
-          height={1000}
-          src={
-            event.image ||
-            "https://placehold.co/1200x600/CCCCCC/FFFFFF/png?text=Sin+imagen"
-          }
-          alt={event.name}
-          className="w-full h-96 object-cover"
-        />
-        <div className="p-6">
-          <h1 className="text-3xl font-bold mb-4 text-gray-900">{event.name}</h1>
-          <p className="text-gray-800 mb-2">
-            {formatDate(event.event_date)} - {formatTime(event.event_date)}
-          </p>
-          <p className="text-gray-800 mb-4">{event.location}</p>
-          <p className="text-gray-900 mb-6">{event.description}</p>
-          <div className="flex justify-between items-center">
+    <PageContainer className="py-6 sm:py-10">
+      <Card className="overflow-hidden p-0">
+        <div className="relative aspect-video w-full sm:aspect-[21/9] sm:max-h-[min(420px,50vh)] sm:min-h-[240px]">
+          <Image
+            fill
+            src={
+              event.image ||
+              "https://placehold.co/1200x600/27272a/a1a1aa/png?text=Sin+imagen"
+            }
+            alt={event.name}
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 1152px"
+            priority
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-transparent to-transparent sm:hidden" />
+        </div>
+        <div className="space-y-6 p-5 sm:p-8">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">
+              {event.name}
+            </h1>
+            <p className="mt-2 text-sm text-zinc-400 sm:text-base">
+              {formatDate(event.event_date)} · {formatTime(event.event_date)}
+            </p>
+            <p className="mt-1 text-sm text-zinc-500">{event.location}</p>
+          </div>
+
+          <Card className="border-white/5 bg-zinc-950/50 p-4 sm:p-5">
+            <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">
+              {event.description}
+            </p>
+          </Card>
+
+          <div className="flex flex-col gap-6 border-t border-white/10 pt-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-xl font-bold text-black">${event.price.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', minimumFractionDigits: 2 })}</p>
-              <p className="text-gray-800">
+              <p className="text-2xl font-bold text-violet-400">
+                {event.price.toLocaleString("es-AR", {
+                  style: "currency",
+                  currency: "ARS",
+                  minimumFractionDigits: 2,
+                })}
+              </p>
+              <p className="mt-1 text-sm text-zinc-500">
                 Capacidad: {event.capacity} personas
               </p>
             </div>
+
             {!showForm ? (
-              <button
+              <Button
+                type="button"
                 onClick={() => setShowForm(true)}
-                className="bg-black text-white px-6 py-3 rounded-full hover:bg-gray-800 transition-colors"
+                className="w-full shrink-0 sm:w-auto"
               >
-                Comprar Entradas
-              </button>
+                Comprar entradas
+              </Button>
             ) : (
-              <div className="w-full max-w-md">
-                <form onSubmit={(e) => { e.preventDefault(); handlePayment(); }} className="space-y-4">
+              <div className="w-full max-w-md space-y-4 sm:ml-auto">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handlePayment();
+                  }}
+                  className="space-y-4"
+                >
                   <div>
-                    <label htmlFor="name" className="block text-sm font-semibold text-gray-900">
+                    <Label htmlFor="name" className="mb-1.5">
                       Nombre completo
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="text"
                       id="name"
                       name="name"
                       required
                       value={buyerInfo.name}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-lg border border-gray-400 shadow-sm focus:border-2 focus:border-black focus:ring-black text-gray-900 placeholder-gray-500 bg-white py-2 px-4 text-base transition-colors duration-150"
                       placeholder="Tu nombre"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-gray-900">
+                    <Label htmlFor="email" className="mb-1.5">
                       Email
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="email"
                       id="email"
                       name="email"
                       required
                       value={buyerInfo.email}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-lg border border-gray-400 shadow-sm focus:border-2 focus:border-black focus:ring-black text-gray-900 placeholder-gray-500 bg-white py-2 px-4 text-base transition-colors duration-150"
                       placeholder="tucorreo@email.com"
                     />
                   </div>
                   <div>
-                    <label htmlFor="quantity" className="block text-sm font-semibold text-gray-900">
+                    <Label htmlFor="quantity" className="mb-1.5">
                       Cantidad de entradas
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       type="number"
                       id="quantity"
                       name="quantity"
-                      min="1"
+                      min={1}
                       max={event.capacity}
                       required
                       value={buyerInfo.quantity}
                       onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-lg border border-gray-400 shadow-sm focus:border-2 focus:border-black focus:ring-black text-gray-900 placeholder-gray-500 bg-white py-2 px-4 text-base transition-colors duration-150"
                       placeholder="1"
                     />
                   </div>
-                  <div className="flex justify-end space-x-4">
-                    <button
+                  <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
+                    <Button
                       type="button"
+                      variant="ghost"
                       onClick={() => setShowForm(false)}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                      className="w-full sm:w-auto"
                     >
                       Cancelar
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="submit"
                       disabled={isLoading}
-                      className="bg-black text-white px-6 py-2 rounded-full hover:bg-gray-800 transition-colors"
+                      className="w-full sm:w-auto"
                     >
-                      {isLoading ? "Procesando..." : "Continuar al pago"}
-                    </button>
+                      {isLoading ? "Procesando…" : "Continuar al pago"}
+                    </Button>
                   </div>
                 </form>
               </div>
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </Card>
+    </PageContainer>
   );
 };
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { Button, Card, Input, Label, PageContainer } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -31,79 +32,72 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <PageContainer className="flex min-h-[80vh] flex-col items-center justify-center py-10">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h1 className="text-3xl font-bold text-gray-900 text-center mb-2">
-            Iniciar Sesión
+        <Card className="p-6 sm:p-8">
+          <h1 className="mb-2 text-center text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">
+            Iniciar sesión
           </h1>
-          <p className="text-gray-500 text-center mb-8">
+          <p className="mb-8 text-center text-sm text-zinc-500">
             Ingresá a tu cuenta de Entradas Rosario
           </p>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">
+            <div
+              className="mb-6 rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-300"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold text-gray-900 mb-1"
-              >
+              <Label htmlFor="email" className="mb-1.5">
                 Email
-              </label>
-              <input
+              </Label>
+              <Input
                 type="email"
                 id="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                 placeholder="tucorreo@email.com"
+                autoComplete="email"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold text-gray-900 mb-1"
-              >
+              <Label htmlFor="password" className="mb-1.5">
                 Contraseña
-              </label>
-              <input
+              </Label>
+              <Input
                 type="password"
                 id="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black transition-colors"
                 placeholder="Tu contraseña"
+                autoComplete="current-password"
               />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? "Ingresando..." : "Ingresar"}
-            </button>
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Ingresando…" : "Ingresar"}
+            </Button>
           </form>
 
-          <p className="mt-6 text-center text-gray-600 text-sm">
+          <p className="mt-6 text-center text-sm text-zinc-500">
             ¿No tenés cuenta?{" "}
             <Link
               href="/registro"
-              className="text-black font-semibold hover:underline"
+              className="font-semibold text-violet-400 hover:text-violet-300"
             >
               Registrate
             </Link>
           </p>
-        </div>
+        </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }

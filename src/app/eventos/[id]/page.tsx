@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import EventDetail from "@/components/EventDetail";
+import { PageContainer } from "@/components/ui";
 import { Event } from "@/types/event";
 import { eventsService } from "@/services/events";
 
@@ -31,29 +32,31 @@ export default function EventPage(props: { params: Params }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <main className="flex-grow flex items-center justify-center">
-          <div className="text-center">Cargando evento...</div>
-        </main>
-      </div>
+      <PageContainer className="flex flex-1 flex-col py-10">
+        <div className="animate-pulse space-y-4">
+          <div className="aspect-video w-full rounded-2xl bg-zinc-800" />
+          <div className="h-8 w-2/3 rounded-lg bg-zinc-800" />
+          <div className="h-4 w-1/2 rounded bg-zinc-800/80" />
+          <div className="h-32 w-full rounded-2xl bg-zinc-800/60" />
+        </div>
+        <p className="mt-6 text-center text-sm text-zinc-500">Cargando evento…</p>
+      </PageContainer>
     );
   }
 
   if (error || !event) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <main className="flex-grow flex items-center justify-center">
-          <div className="text-center text-red-500">
-            {error || "Evento no encontrado"}
-          </div>
-        </main>
-      </div>
+      <PageContainer className="flex flex-1 flex-col items-center justify-center py-16 text-center">
+        <div className="max-w-md rounded-2xl border border-red-500/20 bg-red-950/30 px-6 py-8">
+          <p className="text-red-300">{error || "Evento no encontrado"}</p>
+        </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-grow">
+    <div className="flex flex-1 flex-col">
+      <main className="flex-1">
         <EventDetail event={event} />
       </main>
     </div>

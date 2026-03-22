@@ -20,8 +20,8 @@ export default function CreateEventPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-[80vh] flex items-center justify-center">
-        <p className="text-gray-400">Cargando...</p>
+      <div className="flex min-h-[80vh] items-center justify-center px-4">
+        <p className="text-sm text-zinc-500">Cargando…</p>
       </div>
     );
   }

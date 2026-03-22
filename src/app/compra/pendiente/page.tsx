@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import { Card, PageContainer } from "@/components/ui";
 
 export default function CompraPendientePage() {
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <PageContainer className="flex min-h-[80vh] flex-col items-center justify-center py-10">
       <div className="w-full max-w-lg text-center">
-        <div className="bg-white rounded-2xl shadow-xl p-10">
-          <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
+        <Card className="p-8 sm:p-10">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-amber-500/15 ring-1 ring-amber-500/30">
             <svg
-              className="w-10 h-10 text-yellow-600"
+              className="h-10 w-10 text-amber-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -23,26 +24,24 @@ export default function CompraPendientePage() {
             </svg>
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">
+          <h1 className="mb-3 text-xl font-bold text-white sm:text-2xl md:text-3xl">
             Pago pendiente
           </h1>
-          <p className="text-gray-600">
-            Tu pago está siendo procesado. Te notificaremos por email cuando se
-            confirme.
+          <p className="text-zinc-400">
+            Tu pago está siendo procesado. Te notificaremos por email cuando se confirme.
           </p>
-          <p className="text-gray-500 text-sm mt-4">
-            Esto puede tardar unos minutos dependiendo del método de pago
-            elegido.
+          <p className="mt-4 text-sm text-zinc-500">
+            Esto puede tardar unos minutos dependiendo del método de pago elegido.
           </p>
 
           <Link
             href="/"
-            className="inline-block mt-8 bg-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+            className="mt-8 inline-flex min-h-[44px] items-center justify-center rounded-xl bg-violet-600 px-8 py-3 font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
           >
             Volver al inicio
           </Link>
-        </div>
+        </Card>
       </div>
-    </div>
+    </PageContainer>
   );
 }
