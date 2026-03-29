@@ -17,6 +17,25 @@ interface AssignedScanner {
   assigned_at: string;
 }
 
+interface PendingInvitation {
+  id: number;
+  email: string;
+  created_at: string;
+  expires_at: string;
+}
+
+type InviteScannerResponse =
+  | {
+      kind: "invited";
+      message: string;
+      invitationId: number;
+    }
+  | {
+      kind: "assigned";
+      message: string;
+      scanner: { id: number; name: string; email: string };
+    };
+
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString("es-AR", {
     day: "numeric",
@@ -103,9 +122,11 @@ function DashboardPageContent() {
   };
 
   const [scannersByEvent, setScannersByEvent] = useState<Record<number, AssignedScanner[]>>({});
+  const [pendingByEvent, setPendingByEvent] = useState<Record<number, PendingInvitation[]>>({});
   const [scannerEmail, setScannerEmail] = useState("");
   const [scannerEventId, setScannerEventId] = useState<number | null>(null);
   const [scannerMsg, setScannerMsg] = useState("");
+  const [resendLoadingId, setResendLoadingId] = useState<number | null>(null);
 
   const loadScanners = async (eventId: number) => {
     try {
@@ -114,18 +135,44 @@ function DashboardPageContent() {
     } catch { /* silent */ }
   };
 
+  const loadPendingInvitations = async (eventId: number) => {
+    try {
+      const data = await apiClient.get<PendingInvitation[]>(
+        `/scanner/event/${eventId}/invitations/pending`
+      );
+      setPendingByEvent((prev) => ({ ...prev, [eventId]: data }));
+    } catch { /* silent */ }
+  };
+
   const handleAssignScanner = async (eventId: number) => {
     if (!scannerEmail.trim()) return;
     setScannerMsg("");
     try {
-      await apiClient.post("/scanner/assign", { eventId, scannerEmail: scannerEmail.trim() });
+      const res = await apiClient.post<InviteScannerResponse>("/scanner/invitations", {
+        eventId,
+        scannerEmail: scannerEmail.trim(),
+      });
       setScannerEmail("");
-      setScannerEventId(null);
-      setScannerMsg("Escaneador asignado correctamente");
+      setScannerMsg(res.message);
       loadScanners(eventId);
+      loadPendingInvitations(eventId);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Error al asignar escaneador";
+      const msg = err instanceof Error ? err.message : "Error al enviar la invitación";
       setScannerMsg(msg);
+    }
+  };
+
+  const handleResendInvitation = async (eventId: number, invitationId: number) => {
+    setResendLoadingId(invitationId);
+    setScannerMsg("");
+    try {
+      await apiClient.post(`/scanner/invitations/${invitationId}/resend`, {});
+      setScannerMsg("Invitación reenviada por correo");
+      loadPendingInvitations(eventId);
+    } catch (err: unknown) {
+      setScannerMsg(err instanceof Error ? err.message : "Error al reenviar");
+    } finally {
+      setResendLoadingId(null);
     }
   };
 
@@ -142,6 +189,7 @@ function DashboardPageContent() {
     } else {
       setScannerEventId(eventId);
       if (!scannersByEvent[eventId]) loadScanners(eventId);
+      if (!pendingByEvent[eventId]) loadPendingInvitations(eventId);
     }
     setScannerMsg("");
   };
@@ -317,9 +365,49 @@ function DashboardPageContent() {
                   <div className="mt-4 w-full border-t border-white/10 pt-4">
                     <Card className="border-white/5 bg-zinc-950/40 p-4">
                       <h4 className="mb-3 text-sm font-semibold text-zinc-200">
-                        Escaneadores asignados
+                        Escaneadores
                       </h4>
 
+                      {pendingByEvent[event.id]?.length ? (
+                        <div className="mb-4">
+                          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+                            Invitaciones pendientes
+                          </p>
+                          <div className="space-y-2">
+                            {pendingByEvent[event.id].map((inv) => (
+                              <div
+                                key={inv.id}
+                                className="flex flex-col gap-2 rounded-xl border border-amber-500/20 bg-amber-950/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                              >
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm text-amber-100/90">{inv.email}</p>
+                                  <p className="text-xs text-zinc-500">
+                                    Expira{" "}
+                                    {new Date(inv.expires_at).toLocaleDateString("es-AR", {
+                                      day: "numeric",
+                                      month: "short",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  disabled={resendLoadingId === inv.id}
+                                  onClick={() => handleResendInvitation(event.id, inv.id)}
+                                  className="shrink-0 rounded-lg border border-amber-500/30 bg-amber-950/40 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-950/60 disabled:opacity-50"
+                                >
+                                  {resendLoadingId === inv.id ? "Enviando…" : "Reenviar invitación"}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+                        Activos
+                      </p>
                       {scannersByEvent[event.id]?.length ? (
                         <div className="mb-4 space-y-2">
                           {scannersByEvent[event.id].map((s) => (
@@ -342,15 +430,18 @@ function DashboardPageContent() {
                           ))}
                         </div>
                       ) : (
-                        <p className="mb-4 text-sm text-zinc-500">No hay escaneadores asignados</p>
+                        <p className="mb-4 text-sm text-zinc-500">Ningún escaneador activo todavía</p>
                       )}
 
+                      <p className="mb-2 text-xs text-zinc-500">
+                        Enviá una invitación por correo. La persona creará su cuenta y quedará vinculada a este evento.
+                      </p>
                       <div className="flex flex-col gap-2 sm:flex-row">
                         <Input
                           type="email"
                           value={scannerEmail}
                           onChange={(e) => setScannerEmail(e.target.value)}
-                          placeholder="Email del escaneador"
+                          placeholder="Email del futuro escaneador"
                           className="flex-1"
                           onKeyDown={(e) => {
                             if (e.key === "Enter") handleAssignScanner(event.id);
@@ -361,7 +452,7 @@ function DashboardPageContent() {
                           onClick={() => handleAssignScanner(event.id)}
                           className="w-full shrink-0 sm:w-auto"
                         >
-                          Asignar
+                          Invitar
                         </Button>
                       </div>
 

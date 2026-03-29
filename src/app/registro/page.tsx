@@ -13,7 +13,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [type, setType] = useState<"buyer" | "seller" | "scanner">("buyer");
+  const [type, setType] = useState<"buyer" | "seller">("buyer");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -133,6 +133,9 @@ export default function RegisterPage() {
 
             <div>
               <p className="mb-2 text-sm font-medium text-zinc-300">Tipo de cuenta</p>
+              <p className="mb-2 text-xs text-zinc-500">
+                Los escaneadores de QR se invitan desde el panel del organizador al crear un evento.
+              </p>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <button
                   type="button"
@@ -147,13 +150,6 @@ export default function RegisterPage() {
                   className={`${pill} ${type === "seller" ? pillActive : pillIdle}`}
                 >
                   Organizador
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setType("scanner")}
-                  className={`${pill} ${type === "scanner" ? pillActive : pillIdle}`}
-                >
-                  Escaneador
                 </button>
               </div>
             </div>
