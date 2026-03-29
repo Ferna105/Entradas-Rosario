@@ -59,7 +59,12 @@ const EventList: FC<EventListProps> = ({ events }) => {
             <p className="line-clamp-2 text-sm text-zinc-400">{event.description}</p>
             <div className="flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-lg font-bold text-violet-400">
-                ${event.price.toLocaleString("es-AR")}
+                Desde{" "}
+                {event.minPrice.toLocaleString("es-AR", {
+                  style: "currency",
+                  currency: "ARS",
+                  minimumFractionDigits: 0,
+                })}
               </span>
               <Link
                 href={`/eventos/${event.id}`}

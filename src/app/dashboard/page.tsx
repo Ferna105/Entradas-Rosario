@@ -319,7 +319,11 @@ function DashboardPageContent() {
                       {formatDate(event.event_date)} · {event.location}
                     </p>
                     <p className="mt-1 text-sm text-zinc-500">
-                      ${Number(event.price).toLocaleString("es-AR")} · Capacidad: {event.capacity}
+                      Desde ${Number(event.minPrice).toLocaleString("es-AR")} ·{" "}
+                      {event.ticketTypes?.length ?? 0}{" "}
+                      {(event.ticketTypes?.length ?? 0) === 1
+                        ? "tipo de entrada"
+                        : "tipos de entrada"}
                     </p>
                   </div>
 

@@ -67,6 +67,13 @@ export default function EditEventPage({
   const formInitial: Partial<CreateEventData> = {
     ...event,
     image: event.image ?? undefined,
+    ticketTypes: event.ticketTypes.map((t) => ({
+      id: t.id,
+      name: t.name,
+      price: t.price,
+      capacity: t.capacity,
+      sortOrder: t.sort_order,
+    })),
   };
 
   return (
