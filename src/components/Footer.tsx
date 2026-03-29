@@ -78,8 +78,24 @@ const Footer: FC = () => {
               Contacto
             </h4>
             <ul className="space-y-2 text-sm text-zinc-400">
-              <li>Email: info@entradasrosario.com</li>
-              <li>Tel: (0341) 123-4567</li>
+              <li>
+                Email:{" "}
+                <a
+                  href="mailto:rosario.entradas.ok@gmail.com"
+                  className="text-violet-400 transition-colors hover:text-violet-300"
+                >
+                  rosario.entradas.ok@gmail.com
+                </a>
+              </li>
+              <li>
+                Tel:{" "}
+                <a
+                  href="tel:+543413092012"
+                  className="text-violet-400 transition-colors hover:text-violet-300"
+                >
+                  +54 341 309-2012
+                </a>
+              </li>
               <li>Rosario, Santa Fe</li>
             </ul>
           </div>
