@@ -113,6 +113,15 @@ export default function Header() {
                         Mis Eventos
                       </Link>
                     )}
+                    {user.type === "buyer" && (
+                      <Link
+                        href="/mis-entradas"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-3 text-sm text-zinc-300 transition-colors hover:bg-white/5 hover:text-violet-400"
+                      >
+                        Mis entradas
+                      </Link>
+                    )}
                     {user.type === "scanner" && (
                       <Link
                         href="/scanner"
@@ -218,6 +227,17 @@ export default function Header() {
                       </Link>
                     </li>
                   )}
+                  {user.type === "buyer" && (
+                    <li>
+                      <Link
+                        href="/mis-entradas"
+                        onClick={closeNav}
+                        className="flex min-h-[44px] items-center rounded-xl px-4 text-zinc-200 hover:bg-white/5"
+                      >
+                        Mis entradas
+                      </Link>
+                    </li>
+                  )}
                   {user.type === "scanner" && (
                     <li>
                       <Link
@@ -294,6 +314,15 @@ export default function Header() {
                     className="block px-4 py-3 text-sm text-zinc-300 hover:bg-white/5"
                   >
                     Mis Eventos
+                  </Link>
+                )}
+                {user.type === "buyer" && (
+                  <Link
+                    href="/mis-entradas"
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-3 text-sm text-zinc-300 hover:bg-white/5"
+                  >
+                    Mis entradas
                   </Link>
                 )}
                 {user.type === "scanner" && (
