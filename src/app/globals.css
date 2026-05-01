@@ -1,33 +1,227 @@
 @import "tailwindcss";
 
-/* Dark-only design tokens */
+/* ============================================
+   EventoAbierto — Design Tokens
+   ============================================ */
+
 :root {
-  --bg: #09090b;
-  --surface: #18181b;
-  --surface-elevated: #27272a;
-  --border: rgba(255, 255, 255, 0.08);
-  --text: #fafafa;
-  --text-muted: #a1a1aa;
-  --accent: #8b5cf6;
-  --accent-hover: #7c3aed;
-  --danger: #f87171;
-  --success: #4ade80;
+  /* === COLOR — Base oscura === */
+  --ink-0: #050507;
+  --ink-1: #0a0a0f;
+  --ink-2: #111118;
+  --ink-3: #1a1a24;
+  --ink-4: #242432;
+  --ink-5: #36364a;
+
+  /* === COLOR — Violeta (primario) === */
+  --violet-50: #f3eeff;
+  --violet-100: #e4d6ff;
+  --violet-200: #c9aeff;
+  --violet-300: #a780ff;
+  --violet-400: #8b5cff;
+  --violet-500: #7338f5;
+  --violet-600: #5a1fd1;
+  --violet-700: #4316a3;
+  --violet-800: #2e0e6e;
+  --violet-900: #1a0744;
+  --violet-950: #0e0428;
+
+  /* === COLOR — Amarillo (acento) === */
+  --yellow-50: #fffbe6;
+  --yellow-100: #fff3a3;
+  --yellow-200: #ffe85c;
+  --yellow-300: #ffd91f;
+  --yellow-400: #f5c000;
+  --yellow-500: #d9a300;
+  --yellow-600: #a37700;
+
+  /* === COLOR — Texto === */
+  --text-primary: #f5f5fa;
+  --text-secondary: #a8a8b8;
+  --text-tertiary: #6b6b80;
+  --text-disabled: #3f3f52;
+  --text-on-yellow: #1a0744;
+  --text-on-violet: #ffffff;
+
+  /* === COLOR — Semánticos === */
+  --success: #22c98c;
+  --success-bg: #0d2e22;
+  --danger: #ff5470;
+  --danger-bg: #2e0d18;
+  --warning: #ffb547;
+  --warning-bg: #2e1f0d;
+  --info: #4dabff;
+  --info-bg: #0d1e2e;
+
+  /* === Glow / Halo === */
+  --glow-violet: 0 0 0 1px rgba(139, 92, 255, 0.3), 0 8px 32px -8px rgba(139, 92, 255, 0.45);
+  --glow-yellow: 0 0 0 1px rgba(255, 217, 31, 0.3), 0 8px 32px -8px rgba(255, 217, 31, 0.55);
+
+  /* === Tipografía === */
+  --font-sans: var(--font-geist-sans), "Geist", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-geist-mono), "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 44px;
+  --text-4xl: 60px;
+  --text-5xl: 84px;
+
+  --tracking-tight: -0.04em;
+  --tracking-snug: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-mega: 0.18em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --leading-tight: 1.05;
+  --leading-snug: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* === Spacing === */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  /* === Radii === */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* === Shadows === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.7);
+
+  /* === Motion === */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 320ms;
+
+  /* === Aliases para compatibilidad con configuración previa === */
+  --bg: var(--ink-1);
+  --surface: var(--ink-2);
+  --surface-elevated: var(--ink-3);
+  --border: var(--ink-4);
+  --text: var(--text-primary);
+  --text-muted: var(--text-secondary);
+  --accent: var(--violet-500);
+  --accent-hover: var(--violet-600);
   --background: var(--bg);
   --foreground: var(--text);
 }
 
+/* === Tokens expuestos a Tailwind v4 === */
 @theme inline {
-  --color-background: var(--background);
+  /* Backgrounds y superficies */
+  --color-background: var(--bg);
   --color-foreground: var(--foreground);
   --color-bg: var(--bg);
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
+
+  /* Ink scale */
+  --color-ink-0: var(--ink-0);
+  --color-ink-1: var(--ink-1);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-ink-5: var(--ink-5);
+
+  /* Violet scale */
+  --color-violet-50: var(--violet-50);
+  --color-violet-100: var(--violet-100);
+  --color-violet-200: var(--violet-200);
+  --color-violet-300: var(--violet-300);
+  --color-violet-400: var(--violet-400);
+  --color-violet-500: var(--violet-500);
+  --color-violet-600: var(--violet-600);
+  --color-violet-700: var(--violet-700);
+  --color-violet-800: var(--violet-800);
+  --color-violet-900: var(--violet-900);
+  --color-violet-950: var(--violet-950);
+
+  /* Yellow scale */
+  --color-yellow-50: var(--yellow-50);
+  --color-yellow-100: var(--yellow-100);
+  --color-yellow-200: var(--yellow-200);
+  --color-yellow-300: var(--yellow-300);
+  --color-yellow-400: var(--yellow-400);
+  --color-yellow-500: var(--yellow-500);
+  --color-yellow-600: var(--yellow-600);
+
+  /* Semánticos */
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
+
+  /* Texto */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-disabled: var(--text-disabled);
+  --color-text-on-yellow: var(--text-on-yellow);
+  --color-text-on-violet: var(--text-on-violet);
+
+  /* Aliases */
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
-  --color-danger: var(--danger);
-  --color-success: var(--success);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Tipografía */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
+  /* Radii */
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-full: var(--radius-full);
+
+  /* Shadows */
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-glow-violet: var(--glow-violet);
+  --shadow-glow-yellow: var(--glow-yellow);
+
+  /* Motion */
+  --ease-out: var(--ease-out);
+  --ease-spring: var(--ease-spring);
 }
 
 html {
@@ -35,14 +229,28 @@ html {
 }
 
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  line-height: 1.6;
+  background: var(--ink-1);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01", "ss03";
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
 }
 
-/* Slick Carousel Base Styles */
+button { font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--ink-1); }
+::-webkit-scrollbar-thumb { background: var(--ink-4); border-radius: 8px; border: 2px solid var(--ink-1); }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-5); }
+
+/* ============================================
+   Slick Carousel — Base Styles
+   ============================================ */
 .slick-slider {
   position: relative;
   display: block;
@@ -60,9 +268,7 @@ body {
   padding: 0;
 }
 
-.slick-list:focus {
-  outline: none;
-}
+.slick-list:focus { outline: none; }
 
 .slick-list.dragging {
   cursor: pointer;
@@ -89,9 +295,7 @@ body {
   content: "";
 }
 
-.slick-track:after {
-  clear: both;
-}
+.slick-track:after { clear: both; }
 
 .slick-slide {
   display: none;
@@ -100,21 +304,13 @@ body {
   min-height: 1px;
 }
 
-.slick-slide img {
-  display: block;
-}
+.slick-slide img { display: block; }
 
-.slick-initialized .slick-slide {
-  display: block;
-}
+.slick-initialized .slick-slide { display: block; }
 
-.slick-loading .slick-track {
-  visibility: hidden;
-}
+.slick-loading .slick-track { visibility: hidden; }
 
-.slick-loading .slick-slide {
-  visibility: hidden;
-}
+.slick-loading .slick-slide { visibility: hidden; }
 
 .slick-vertical .slick-slide {
   display: block;
@@ -122,9 +318,7 @@ body {
   border: 1px solid transparent;
 }
 
-.slick-arrow.slick-hidden {
-  display: none;
-}
+.slick-arrow.slick-hidden { display: none; }
 
 /* Slick Theme — dark UI */
 .slick-prev,
@@ -144,9 +338,9 @@ body {
   color: transparent;
   border: none;
   outline: none;
-  background: rgba(24, 24, 27, 0.75);
+  background: rgba(17, 17, 24, 0.75);
   border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--ink-4);
   z-index: 10;
   transition: background 0.15s ease;
 }
@@ -155,13 +349,13 @@ body {
 .slick-prev:focus-visible,
 .slick-next:hover,
 .slick-next:focus-visible {
-  background: rgba(39, 39, 42, 0.9);
+  background: rgba(26, 26, 36, 0.9);
   outline: none;
 }
 
 .slick-prev:focus-visible,
 .slick-next:focus-visible {
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 2px var(--violet-400);
 }
 
 .slick-prev:hover:before,
@@ -181,26 +375,16 @@ body {
   font-size: 18px;
   line-height: 1;
   opacity: 0.9;
-  color: #fafafa;
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.slick-prev {
-  left: 12px;
-}
+.slick-prev { left: 12px; }
+.slick-prev:before { content: "←"; }
 
-.slick-prev:before {
-  content: "←";
-}
-
-.slick-next {
-  right: 12px;
-}
-
-.slick-next:before {
-  content: "→";
-}
+.slick-next { right: 12px; }
+.slick-next:before { content: "→"; }
 
 .slick-dots {
   position: absolute;
@@ -257,14 +441,14 @@ body {
   content: "•";
   text-align: center;
   opacity: 0.35;
-  color: #fafafa;
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .slick-dots li.slick-active button:before {
   opacity: 1;
-  color: var(--accent);
+  color: var(--violet-400);
 }
 
 /* Carousel home — scoped tweaks */

@@ -10,10 +10,9 @@ const Footer: FC = () => {
       <PageContainer>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <h3 className="mb-3 text-lg font-bold text-white">Entradas Rosario</h3>
+            <h3 className="mb-3 text-lg font-bold text-white">EventoAbierto</h3>
             <p className="text-sm leading-relaxed text-zinc-400">
-              Tu plataforma de confianza para comprar entradas a los mejores eventos de
-              Rosario.
+              Comprá entradas en segundos. Vendé las tuyas con MercadoPago. Sin vueltas.
             </p>
           </div>
 
@@ -103,7 +102,7 @@ const Footer: FC = () => {
 
         <div className="mt-10 border-t border-white/10 pt-8 text-center text-sm text-zinc-500">
           <p>
-            &copy; {new Date().getFullYear()} Entradas Rosario. Todos los derechos
+            &copy; {new Date().getFullYear()} EventoAbierto. Todos los derechos
             reservados.
           </p>
         </div>

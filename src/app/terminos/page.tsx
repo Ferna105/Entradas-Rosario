@@ -5,7 +5,7 @@ import { Card, PageContainer } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Términos y condiciones",
   description:
-    "Términos y condiciones de uso del sitio Entradas Rosario. Leé las reglas de compra, uso de la plataforma y responsabilidades.",
+    "Términos y condiciones de uso del sitio EventoAbierto. Leé las reglas de compra, uso de la plataforma y responsabilidades.",
 };
 
 const section = "space-y-3 text-[15px] leading-relaxed text-zinc-300";
@@ -26,7 +26,7 @@ export default function TerminosPage() {
           <section className={section}>
             <h2 className={h2}>1. Aceptación</h2>
             <p>
-              Al acceder o utilizar el sitio web y los servicios de Entradas Rosario (en
+              Al acceder o utilizar el sitio web y los servicios de EventoAbierto (en
               adelante, la &quot;Plataforma&quot;), el usuario acepta estos términos y
               condiciones. Si no estás de acuerdo, no utilices la Plataforma.
             </p>

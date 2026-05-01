@@ -5,7 +5,7 @@ import { Card, PageContainer } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Política de privacidad",
   description:
-    "Cómo Entradas Rosario trata tus datos personales: finalidad, conservación, derechos y contacto.",
+    "Cómo EventoAbierto trata tus datos personales: finalidad, conservación, derechos y contacto.",
 };
 
 const section = "space-y-3 text-[15px] leading-relaxed text-zinc-300";
@@ -26,7 +26,7 @@ export default function PrivacidadPage() {
           <section className={section}>
             <h2 className={h2}>1. Responsable</h2>
             <p>
-              El sitio Entradas Rosario (la &quot;Plataforma&quot;) trata datos personales
+              El sitio EventoAbierto (la &quot;Plataforma&quot;) trata datos personales
               conforme a la Ley 25.326 de Protección de Datos Personales de Argentina y
               normativa complementaria, en la medida aplicable al servicio.
             </p>

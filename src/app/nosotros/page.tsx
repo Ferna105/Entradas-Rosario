@@ -5,7 +5,7 @@ import { Card, PageContainer } from "@/components/ui";
 export const metadata: Metadata = {
   title: "Nosotros",
   description:
-    "Conocé Entradas Rosario: plataforma para comprar y vender entradas a eventos en Rosario y la región.",
+    "Conocé EventoAbierto: plataforma para comprar y vender entradas a eventos de música en toda Argentina.",
 };
 
 export default function NosotrosPage() {
@@ -19,11 +19,11 @@ export default function NosotrosPage() {
           <section className="space-y-3 text-[15px] leading-relaxed text-zinc-300">
             <h2 className="text-lg font-semibold text-white">Qué hacemos</h2>
             <p>
-              <strong className="text-zinc-200">Entradas Rosario</strong> es una plataforma
-              pensada para conectar a la gente con los eventos de la ciudad: shows,
-              festivales, teatro, deportes y más. Facilitamos la venta de entradas en
-              línea de forma simple y segura, para que los organizadores puedan enfocarse
-              en el evento y el público en disfrutarlo.
+              <strong className="text-zinc-200">EventoAbierto</strong> es una plataforma
+              pensada para conectar a la gente con los eventos: recitales, fiestas,
+              festivales y mucho más. Facilitamos la venta de entradas en línea de forma
+              simple y segura, para que los organizadores puedan enfocarse en el evento y
+              el público en disfrutarlo.
             </p>
           </section>
 

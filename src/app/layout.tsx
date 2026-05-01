@@ -16,8 +16,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Entradas Rosario",
-  description: "Tu plataforma de confianza para comprar entradas a los mejores eventos de Rosario",
+  title: "EventoAbierto · Comprá y vendé entradas online",
+  description:
+    "Comprá entradas en segundos o creá tu propio evento y empezá a vender hoy mismo. Sin vueltas, con MercadoPago.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/favicon-192.png",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-zinc-950 text-zinc-100`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <AuthProvider>
           <Header />

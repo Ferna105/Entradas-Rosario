@@ -53,7 +53,7 @@ export default function Header() {
             onClick={closeNav}
             className="truncate text-lg font-bold tracking-tight text-white sm:text-xl md:text-2xl"
           >
-            Entradas Rosario
+            EventoAbierto
           </Link>
         </div>
 
