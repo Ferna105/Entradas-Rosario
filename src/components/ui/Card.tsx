@@ -1,16 +1,14 @@
 import { HTMLAttributes } from "react";
 
-export function Card({
-  className = "",
-  children,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) {
+export function Card({ className = "", children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={[
-        "rounded-2xl border border-white/[0.08] bg-zinc-900/80 shadow-lg shadow-black/20 backdrop-blur-sm",
+        "rounded-[16px] border border-ink-4 bg-ink-2 shadow-md",
         className,
-      ].join(" ")}
+      ]
+        .filter(Boolean)
+        .join(" ")}
       {...props}
     >
       {children}
