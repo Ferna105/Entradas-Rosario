@@ -40,6 +40,8 @@ interface EventCardOrgProps {
   pending: PendingInvitation[];
   onInvite: (email: string) => Promise<void>;
   onRemove: (scannerId: number) => Promise<void>;
+  onResend?: (invitationId: number) => Promise<void>;
+  onCancel?: () => Promise<void>;
 }
 
 const statusBadge: Record<string, React.ReactNode> = {
@@ -49,11 +51,12 @@ const statusBadge: Record<string, React.ReactNode> = {
   finished:  <Badge tone="violet" size="sm">Finalizado</Badge>,
 };
 
-export function EventCardOrg({ event, scanners, pending, onInvite, onRemove }: EventCardOrgProps) {
+export function EventCardOrg({ event, scanners, pending, onInvite, onRemove, onResend, onCancel }: EventCardOrgProps) {
   const [scannerOpen, setScannerOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviting, setInviting] = useState(false);
   const [removing, setRemoving] = useState<number | null>(null);
+  const [resending, setResending] = useState<number | null>(null);
 
   const handleInvite = async () => {
     if (!inviteEmail.trim()) return;
@@ -97,7 +100,7 @@ export function EventCardOrg({ event, scanners, pending, onInvite, onRemove }: E
           <div className="mt-1 text-[12px] text-text-tertiary">
             Desde{" "}
             <span className="font-semibold text-yellow-300">
-              ${event.minPrice.toLocaleString("es-AR")}
+              ${Number(event.minPrice).toLocaleString("es-AR")}
             </span>
             {" · "}
             {event.ticketTypes.length} {event.ticketTypes.length === 1 ? "tipo de entrada" : "tipos de entrada"}
@@ -106,16 +109,25 @@ export function EventCardOrg({ event, scanners, pending, onInvite, onRemove }: E
 
         {/* Acciones — ocultas en mobile-xs, ajustadas en sm */}
         <div className="flex flex-wrap justify-end gap-[6px] max-sm:col-span-2">
-          <Link href={`/eventos/editar/${event.id}`}>
-            <Button variant="outline" size="sm">Editar</Button>
-          </Link>
-          <Button
-            variant={scannerOpen ? "primary" : "outline"}
-            size="sm"
-            onClick={() => setScannerOpen((v) => !v)}
-          >
-            Escaneadores
-          </Button>
+          {event.status !== "cancelled" && (
+            <>
+              <Link href={`/eventos/editar/${event.id}`}>
+                <Button variant="outline" size="sm">Editar</Button>
+              </Link>
+              <Button
+                variant={scannerOpen ? "primary" : "outline"}
+                size="sm"
+                onClick={() => setScannerOpen((v) => !v)}
+              >
+                Escaneadores
+              </Button>
+              {onCancel && (
+                <Button variant="danger" size="sm" onClick={onCancel}>
+                  Cancelar
+                </Button>
+              )}
+            </>
+          )}
           <Link href={`/eventos/${event.id}`}>
             <Button variant="ghost" size="sm">Ver</Button>
           </Link>
@@ -148,7 +160,19 @@ export function EventCardOrg({ event, scanners, pending, onInvite, onRemove }: E
                         Expira: {new Date(inv.expires_at).toLocaleDateString("es-AR", { day: "numeric", month: "short" })}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">Reenviar invitación</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      loading={resending === inv.id}
+                      disabled={!onResend}
+                      onClick={async () => {
+                        if (!onResend) return;
+                        setResending(inv.id);
+                        try { await onResend(inv.id); } finally { setResending(null); }
+                      }}
+                    >
+                      Reenviar invitación
+                    </Button>
                   </div>
                 ))}
               </div>
