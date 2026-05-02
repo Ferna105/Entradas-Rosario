@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { apiClient } from "@/services/api";
-import { Card, PageContainer } from "@/components/ui";
+import { Badge, Card, Icon, PageContainer, Skeleton } from "@/components/ui";
 
 interface TicketInfo {
   id: number;
@@ -28,6 +28,18 @@ interface PurchaseInfo {
   tickets: TicketInfo[];
 }
 
+function ticketStatusLabel(status: string) {
+  if (status === "valid") return "Válida";
+  if (status === "used") return "Utilizada";
+  return "Cancelada";
+}
+
+function ticketStatusTone(status: string): "success" | "neutral" | "danger" {
+  if (status === "valid") return "success";
+  if (status === "used") return "neutral";
+  return "danger";
+}
+
 function CompraExitoContent() {
   const searchParams = useSearchParams();
   const purchaseId = searchParams.get("purchase");
@@ -35,171 +47,170 @@ function CompraExitoContent() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!purchaseId) {
-      setLoading(false);
-      return;
-    }
-
-    async function loadPurchase() {
-      try {
-        const data = await apiClient.get<PurchaseInfo>(
-          `/payments/purchase/${purchaseId}`
-        );
-        setPurchase(data);
-      } catch {
-        // silently fail
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadPurchase();
+    if (!purchaseId) { setLoading(false); return; }
+    apiClient
+      .get<PurchaseInfo>(`/payments/purchase/${purchaseId}`)
+      .then(setPurchase)
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [purchaseId]);
 
   if (loading) {
     return (
-      <PageContainer className="flex min-h-[80vh] items-center justify-center py-10">
-        <p className="text-sm text-zinc-500">Cargando…</p>
+      <PageContainer className="flex min-h-[80vh] flex-col items-center justify-center py-10">
+        <div className="w-full max-w-2xl space-y-4">
+          <Skeleton className="mx-auto h-20 w-20 rounded-full" />
+          <Skeleton className="mx-auto h-8 w-56 rounded-xl" />
+          <Skeleton className="h-[200px] w-full rounded-2xl" />
+        </div>
       </PageContainer>
     );
   }
 
+  const eventDate = purchase
+    ? new Date(purchase.event.event_date).toLocaleDateString("es-AR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+
   return (
     <PageContainer className="flex min-h-[80vh] flex-col items-center justify-center py-10">
-      <div className="w-full max-w-2xl text-center">
-        <Card className="p-8 sm:p-10">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15 ring-1 ring-emerald-500/30">
-            <svg
-              className="h-10 w-10 text-emerald-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+      <div className="w-full max-w-2xl">
+        {/* Ícono de estado */}
+        <div className="mb-6 flex flex-col items-center text-center">
+          <div
+            className="mb-5 flex h-[72px] w-[72px] items-center justify-center rounded-full"
+            style={{
+              background: "rgba(34,197,94,0.12)",
+              boxShadow: "0 0 0 12px rgba(34,197,94,0.06)",
+            }}
+          >
+            <Icon name="check" size={36} color="var(--success)" strokeWidth={2.2} />
           </div>
-
-          <h1 className="mb-3 text-xl font-bold text-white sm:text-2xl md:text-3xl">
+          <h1 className="text-[28px] font-bold tracking-snug sm:text-[34px]">
             ¡Compra exitosa!
           </h1>
-
-          {purchase ? (
-            <>
-              <div className="mt-6 space-y-2 rounded-xl border border-white/10 bg-zinc-950/50 p-5 text-left">
-                <p className="text-lg font-semibold text-white">
-                  {purchase.event.name}
-                </p>
-                <p className="text-sm text-zinc-400">
-                  {new Date(purchase.event.event_date).toLocaleDateString(
-                    "es-AR",
-                    {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  )}
-                </p>
-                <p className="text-sm text-zinc-400">{purchase.event.location}</p>
-                <div className="mt-2 border-t border-white/10 pt-2">
-                  <p className="text-sm text-zinc-300">
-                    Comprador: {purchase.buyer_name}
-                  </p>
-                  <p className="text-sm text-zinc-300">
-                    Cantidad: {purchase.quantity}{" "}
-                    {purchase.quantity === 1 ? "entrada" : "entradas"}
-                  </p>
-                  <p className="mt-1 font-semibold text-violet-400">
-                    Total: $
-                    {Number(purchase.total_amount).toLocaleString("es-AR")}
-                  </p>
-                </div>
-              </div>
-
-              {purchase.tickets && purchase.tickets.length > 0 && (
-                <div className="mt-8 text-left">
-                  <h2 className="mb-4 text-lg font-bold text-white sm:text-xl">
-                    {purchase.tickets.length > 1
-                      ? `Tus ${purchase.tickets.length} entradas`
-                      : "Tu entrada"}
-                  </h2>
-                  <p className="mb-6 text-sm text-zinc-500">
-                    Presentá {purchase.tickets.length > 1 ? "estos códigos QR" : "este código QR"} en la entrada del evento
-                  </p>
-
-                  <div className="grid grid-cols-1 gap-6">
-                    {purchase.tickets.map((ticket, index) => (
-                      <div
-                        key={ticket.id}
-                        className="rounded-2xl border border-white/10 bg-zinc-950/40 p-6"
-                      >
-                        <p className="mb-3 text-sm text-zinc-500">
-                          Entrada {index + 1} de {purchase.tickets.length}
-                        </p>
-                        {ticket.qr_code && (
-                          <>
-                            {/* eslint-disable-next-line @next/next/no-img-element -- data URL del QR */}
-                            <img
-                              src={ticket.qr_code}
-                              alt={`QR Entrada ${index + 1}`}
-                              className="mx-auto h-56 w-56 max-w-full sm:h-64 sm:w-64"
-                            />
-                          </>
-                        )}
-                        <p className="mt-3 break-all font-mono text-xs text-zinc-500">
-                          {ticket.qr_data}
-                        </p>
-                        <span
-                          className={`mt-3 inline-block rounded-full px-3 py-1 text-xs font-medium ${
-                            ticket.status === "valid"
-                              ? "bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/25"
-                              : ticket.status === "used"
-                              ? "bg-zinc-500/15 text-zinc-400 ring-1 ring-white/10"
-                              : "bg-red-500/15 text-red-300 ring-1 ring-red-500/25"
-                          }`}
-                        >
-                          {ticket.status === "valid"
-                            ? "Válida"
-                            : ticket.status === "used"
-                            ? "Utilizada"
-                            : "Cancelada"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-6 rounded-xl border border-amber-500/25 bg-amber-950/30 p-4 text-left">
-                <p className="text-sm text-amber-200/90">
-                  <strong className="text-amber-100">Importante:</strong> También recibirás{" "}
-                  {purchase.tickets?.length > 1
-                    ? "tus entradas"
-                    : "tu entrada"}{" "}
-                  por email a <strong className="text-white">{purchase.buyer_email}</strong>. Cada QR es
-                  de uso único y será escaneado al ingresar al evento.
-                </p>
-              </div>
-            </>
-          ) : (
-            <p className="mt-4 text-zinc-400">
-              Tu compra fue procesada correctamente. Pronto recibirás un email
-              con tus entradas.
+          {purchase && (
+            <p className="mt-2 text-[15px] text-text-secondary">
+              Tus{" "}
+              {purchase.quantity === 1 ? "entrada fue enviada" : "entradas fueron enviadas"} a{" "}
+              <strong className="text-text-primary">{purchase.buyer_email}</strong>
             </p>
           )}
+        </div>
 
+        {purchase ? (
+          <div className="space-y-4">
+            {/* Detalle de la compra */}
+            <Card className="p-5">
+              <div className="text-[11px] tracking-[0.08em] text-text-tertiary mb-3">
+                DETALLE DE LA COMPRA
+              </div>
+              <div className="space-y-2">
+                <div className="text-[17px] font-semibold">{purchase.event.name}</div>
+                {eventDate && (
+                  <div className="flex items-center gap-2 text-[14px] text-text-secondary">
+                    <Icon name="calendar" size={15} />
+                    {eventDate}
+                  </div>
+                )}
+                {purchase.event.location && (
+                  <div className="flex items-center gap-2 text-[14px] text-text-secondary">
+                    <Icon name="pin" size={15} />
+                    {purchase.event.location}
+                  </div>
+                )}
+                <div className="border-t border-ink-4 pt-3 mt-3 space-y-1">
+                  <div className="flex justify-between text-[14px]">
+                    <span className="text-text-secondary">Comprador</span>
+                    <span className="font-medium">{purchase.buyer_name}</span>
+                  </div>
+                  <div className="flex justify-between text-[14px]">
+                    <span className="text-text-secondary">
+                      {purchase.quantity === 1 ? "Entrada" : "Entradas"}
+                    </span>
+                    <span className="font-medium">{purchase.quantity}</span>
+                  </div>
+                  <div className="flex justify-between text-[14px]">
+                    <span className="text-text-secondary">Total</span>
+                    <span className="text-[16px] font-bold text-yellow-300">
+                      ${Number(purchase.total_amount).toLocaleString("es-AR")}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* QR tickets */}
+            {purchase.tickets?.length > 0 && (
+              <div>
+                <div className="mb-3 text-[11px] tracking-[0.08em] text-text-tertiary">
+                  {purchase.tickets.length === 1 ? "TU ENTRADA" : `TUS ${purchase.tickets.length} ENTRADAS`}
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {purchase.tickets.map((ticket, index) => (
+                    <Card key={ticket.id} className="p-5 text-center">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-[12px] text-text-tertiary">
+                          Entrada {index + 1} de {purchase.tickets.length}
+                        </span>
+                        <Badge tone={ticketStatusTone(ticket.status)} size="sm">
+                          {ticketStatusLabel(ticket.status)}
+                        </Badge>
+                      </div>
+                      {ticket.qr_code && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={ticket.qr_code}
+                          alt={`QR Entrada ${index + 1}`}
+                          className="mx-auto h-52 w-52 max-w-full"
+                        />
+                      )}
+                      <p className="mt-2 break-all font-mono text-[10px] text-text-tertiary">
+                        {ticket.qr_data}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Nota email */}
+            <div className="flex gap-3 rounded-[14px] border border-yellow-300/20 bg-yellow-300/5 p-4">
+              <Icon name="info" size={18} color="var(--yellow-300)" className="mt-0.5 flex-shrink-0" />
+              <p className="text-[13px] text-text-secondary leading-relaxed">
+                También recibís{" "}
+                {purchase.tickets?.length > 1 ? "las entradas" : "la entrada"} por email. Cada QR es de uso único y será escaneado al ingresar al evento.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <Card className="p-6 text-center">
+            <p className="text-text-secondary">
+              Tu compra fue procesada. Pronto recibís un email con{" "}
+              {purchaseId ? "tus entradas." : "la confirmación."}
+            </p>
+          </Card>
+        )}
+
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/mis-entradas"
+            className="inline-flex h-[52px] items-center justify-center rounded-xl bg-yellow-300 px-8 text-[15px] font-semibold text-text-on-yellow transition-all hover:brightness-110"
+          >
+            Ver mis entradas
+          </Link>
           <Link
             href="/"
-            className="mt-8 inline-flex min-h-[44px] items-center justify-center rounded-xl bg-violet-600 px-8 py-3 font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+            className="inline-flex h-[52px] items-center justify-center rounded-xl border border-transparent px-8 text-[15px] font-medium text-text-primary transition-all hover:bg-ink-3"
           >
             Volver al inicio
           </Link>
-        </Card>
+        </div>
       </div>
     </PageContainer>
   );
@@ -210,7 +221,7 @@ export default function CompraExitoPage() {
     <Suspense
       fallback={
         <PageContainer className="flex min-h-[80vh] items-center justify-center py-10">
-          <p className="text-sm text-zinc-500">Cargando…</p>
+          <Skeleton className="h-[320px] w-full max-w-2xl rounded-2xl" />
         </PageContainer>
       }
     >

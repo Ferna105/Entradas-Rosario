@@ -1,9 +1,9 @@
 "use client";
 
-import { FC, useState, useMemo, useEffect } from "react";
+import { FC, useMemo } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Event } from "@/types/event";
-import { eventsService } from "@/services/events";
 import { Avatar, Badge, Button, Card, Icon } from "@/components/ui";
 
 interface EventDetailProps {
@@ -32,47 +32,18 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
     [event.ticketTypes]
   );
   const hasTypes = sortedTypes.length > 0;
+  const isSoldOut = !hasTypes || sortedTypes.every((t) => t.isSoldOut || t.remaining <= 0);
+  const gradient = getGradient(event.id);
 
   const firstAvailableId = useMemo(() => {
     const t = sortedTypes.find((x) => !x.isSoldOut && x.remaining > 0);
     return t?.id ?? sortedTypes[0]?.id ?? 0;
   }, [sortedTypes]);
 
-  const [selectedId, setSelectedId] = useState<number>(firstAvailableId);
-  const [qty, setQty] = useState(1);
-  const [showForm, setShowForm] = useState(false);
-  const [buyerName, setBuyerName] = useState("");
-  const [buyerEmail, setBuyerEmail] = useState("");
-  const [emailConfirm, setEmailConfirm] = useState("");
-  const [emailMismatch, setEmailMismatch] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => { setSelectedId(firstAvailableId); }, [firstAvailableId]);
-
-  const selected = sortedTypes.find((t) => t.id === selectedId);
-  const maxQty = selected ? Math.max(0, selected.remaining) : 0;
-  const total = selected ? Number(selected.price) * qty : 0;
-  const isSoldOut = !hasTypes || sortedTypes.every((t) => t.isSoldOut || t.remaining <= 0);
-  const gradient = getGradient(event.id);
-
-  const handlePayment = async () => {
-    if (!selected || selected.isSoldOut || maxQty <= 0) return;
-    if (buyerEmail !== emailConfirm) { setEmailMismatch(true); return; }
-    setIsLoading(true);
-    try {
-      const { initPoint } = await eventsService.createPaymentPreference({
-        eventId: event.id,
-        ticketTypeId: selectedId,
-        buyerEmail: buyerEmail.trim(),
-        buyerName: buyerName.trim(),
-        quantity: Math.min(qty, maxQty),
-      });
-      window.location.href = initPoint;
-    } catch {
-      alert("Hubo un error al procesar el pago. Por favor, intentá de nuevo.");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleCheckout = () => {
+    router.push(`/eventos/${event.id}/checkout?type=${firstAvailableId}&qty=1`);
   };
 
   const handleShare = () => {
@@ -101,7 +72,6 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
             unoptimized
           />
         )}
-        {/* Overlay degradado hacia abajo */}
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 30%, var(--ink-1) 100%)" }} />
 
         <div className="relative mx-auto flex h-full max-w-[1180px] flex-col justify-end px-6 pb-8 lg:px-8">
@@ -145,35 +115,11 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
               </div>
             )}
 
-            {/* Tipos de entrada */}
-            {hasTypes && (
-              <div>
-                <h2 className="mb-4 text-[24px] font-semibold tracking-snug">Entradas disponibles</h2>
-                <div className="flex flex-col gap-2">
-                  {sortedTypes.map((tt) => (
-                    <div
-                      key={tt.id}
-                      className="flex flex-wrap items-center justify-between gap-2 rounded-[12px] border border-ink-4 bg-ink-2 px-4 py-3 text-[14px]"
-                    >
-                      <span className="font-medium">{tt.name}</span>
-                      <span className="font-bold text-yellow-300">${Number(tt.price).toLocaleString("es-AR")}</span>
-                      <span className="text-[12px] text-text-tertiary">
-                        {tt.isSoldOut || tt.remaining <= 0
-                          ? <span className="text-warning font-medium">Agotada</span>
-                          : `Quedan ${tt.remaining}`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Ubicación */}
             {event.location && (
               <div>
                 <h2 className="mb-4 text-[24px] font-semibold tracking-snug">Ubicación</h2>
                 <Card className="overflow-hidden p-0">
-                  {/* Mapa stilizado decorativo */}
                   <div className="relative flex h-[180px] items-center justify-center bg-ink-3">
                     <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice">
                       <g stroke="var(--ink-4)" fill="none" strokeWidth="1">
@@ -196,9 +142,7 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
                     </div>
                   </div>
                   <div className="flex items-center justify-between p-4">
-                    <div>
-                      <div className="font-semibold">{event.location}</div>
-                    </div>
+                    <div className="font-semibold">{event.location}</div>
                     <Button variant="outline" size="sm" iconRight="arrowRight">Cómo llegar</Button>
                   </div>
                 </Card>
@@ -227,30 +171,13 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
             </div>
           </div>
 
-          {/* ── STICKY BUY PANEL (desktop) ── */}
+          {/* ── PANEL LATERAL (desktop) ── */}
           <div className="hidden lg:block">
-            <BuyPanel
+            <TicketsPanel
               sortedTypes={sortedTypes}
-              selectedId={selectedId}
-              setSelectedId={setSelectedId}
-              qty={qty}
-              setQty={setQty}
-              maxQty={maxQty}
-              total={total}
-              showForm={showForm}
-              setShowForm={setShowForm}
-              buyerName={buyerName}
-              setBuyerName={setBuyerName}
-              buyerEmail={buyerEmail}
-              setBuyerEmail={setBuyerEmail}
-              emailConfirm={emailConfirm}
-              setEmailConfirm={setEmailConfirm}
-              emailMismatch={emailMismatch}
-              setEmailMismatch={setEmailMismatch}
-              isLoading={isLoading}
               isSoldOut={isSoldOut}
               hasTypes={hasTypes}
-              handlePayment={handlePayment}
+              onCheckout={handleCheckout}
               handleShare={handleShare}
             />
           </div>
@@ -271,39 +198,22 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
             size="lg"
             iconRight="arrowRight"
             disabled={isSoldOut}
-            onClick={() => {
-              document.querySelector("#buy-panel-mobile")?.scrollIntoView({ behavior: "smooth" });
-            }}
+            onClick={() =>
+              document.querySelector("#tickets-panel-mobile")?.scrollIntoView({ behavior: "smooth" })
+            }
           >
-            {isSoldOut ? "Agotado" : "Comprar"}
+            {isSoldOut ? "Agotado" : "Ver entradas"}
           </Button>
         </div>
       </div>
 
-      {/* Panel de compra mobile (inline) */}
-      <div id="buy-panel-mobile" className="mx-auto w-full max-w-[1180px] px-6 pb-32 lg:hidden lg:px-8">
-        <BuyPanel
+      {/* ── PANEL DE ENTRADAS mobile (inline) ── */}
+      <div id="tickets-panel-mobile" className="mx-auto w-full max-w-[1180px] px-6 pb-32 lg:hidden lg:px-8">
+        <TicketsPanel
           sortedTypes={sortedTypes}
-          selectedId={selectedId}
-          setSelectedId={setSelectedId}
-          qty={qty}
-          setQty={setQty}
-          maxQty={maxQty}
-          total={total}
-          showForm={showForm}
-          setShowForm={setShowForm}
-          buyerName={buyerName}
-          setBuyerName={setBuyerName}
-          buyerEmail={buyerEmail}
-          setBuyerEmail={setBuyerEmail}
-          emailConfirm={emailConfirm}
-          setEmailConfirm={setEmailConfirm}
-          emailMismatch={emailMismatch}
-          setEmailMismatch={setEmailMismatch}
-          isLoading={isLoading}
           isSoldOut={isSoldOut}
           hasTypes={hasTypes}
-          handlePayment={handlePayment}
+          onCheckout={handleCheckout}
           handleShare={handleShare}
         />
       </div>
@@ -311,160 +221,67 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
   );
 };
 
-/* ── BuyPanel ── */
-interface BuyPanelProps {
+/* ── TicketsPanel ────────────────────────────────────────────────────────── */
+interface TicketsPanelProps {
   sortedTypes: Event["ticketTypes"];
-  selectedId: number;
-  setSelectedId: (id: number) => void;
-  qty: number;
-  setQty: (q: number) => void;
-  maxQty: number;
-  total: number;
-  showForm: boolean;
-  setShowForm: (v: boolean) => void;
-  buyerName: string; setBuyerName: (v: string) => void;
-  buyerEmail: string; setBuyerEmail: (v: string) => void;
-  emailConfirm: string; setEmailConfirm: (v: string) => void;
-  emailMismatch: boolean; setEmailMismatch: (v: boolean) => void;
-  isLoading: boolean;
   isSoldOut: boolean;
   hasTypes: boolean;
-  handlePayment: () => void;
+  onCheckout: () => void;
   handleShare: () => void;
 }
 
-function BuyPanel({
-  sortedTypes, selectedId, setSelectedId, qty, setQty, maxQty, total,
-  showForm, setShowForm, buyerName, setBuyerName, buyerEmail, setBuyerEmail,
-  emailConfirm, setEmailConfirm, emailMismatch, setEmailMismatch,
-  isLoading, isSoldOut, hasTypes, handlePayment, handleShare,
-}: BuyPanelProps) {
+function TicketsPanel({ sortedTypes, isSoldOut, hasTypes, onCheckout, handleShare }: TicketsPanelProps) {
   return (
     <div className="sticky top-6 self-start space-y-3">
       <div className="rounded-[20px] border border-ink-4 bg-ink-2 p-6">
-        <div className="mb-3 text-[11px] tracking-[0.08em] text-text-tertiary">ELEGÍ TU ENTRADA</div>
+        <div className="mb-4 text-[11px] tracking-[0.08em] text-text-tertiary">ENTRADAS DISPONIBLES</div>
 
-        {hasTypes && (
-          <div className="mb-5 flex flex-col gap-[10px]">
+        {hasTypes ? (
+          <div className="mb-5 flex flex-col gap-2">
             {sortedTypes.map((tt) => {
-              const disabled = tt.isSoldOut || tt.remaining <= 0;
-              const active = selectedId === tt.id;
+              const soldOut = tt.isSoldOut || tt.remaining <= 0;
               return (
-                <button
+                <div
                   key={tt.id}
-                  type="button"
-                  disabled={disabled}
-                  onClick={() => { if (!disabled) setSelectedId(tt.id); }}
                   className={[
-                    "flex items-center justify-between rounded-[12px] border p-4 text-left transition-all",
-                    active ? "border-violet-400 bg-[rgba(139,92,255,0.1)]" : "border-ink-4 bg-ink-3",
-                    disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer hover:border-ink-5",
+                    "flex items-center justify-between rounded-[12px] border border-ink-4 bg-ink-3 px-4 py-3",
+                    soldOut ? "opacity-50" : "",
                   ].filter(Boolean).join(" ")}
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[15px] font-semibold">{tt.name}</span>
-                      {tt.remaining > 0 && tt.remaining <= 20 && (
-                        <Badge tone="yellow" size="sm">Quedan {tt.remaining}</Badge>
-                      )}
-                      {disabled && <Badge tone="neutral" size="sm">Agotada</Badge>}
-                    </div>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-[14px] font-semibold truncate">{tt.name}</span>
+                    {soldOut ? (
+                      <Badge tone="neutral" size="sm">Agotada</Badge>
+                    ) : tt.remaining > 0 && tt.remaining <= 20 ? (
+                      <Badge tone="yellow" size="sm">Quedan {tt.remaining}</Badge>
+                    ) : null}
                   </div>
-                  <div className="text-[18px] font-bold text-yellow-300">
+                  <span className={[
+                    "ml-3 flex-shrink-0 text-[17px] font-bold",
+                    soldOut ? "text-text-tertiary" : "text-yellow-300",
+                  ].join(" ")}>
                     ${Number(tt.price).toLocaleString("es-AR")}
-                  </div>
-                </button>
+                  </span>
+                </div>
               );
             })}
           </div>
-        )}
-
-        {/* Cantidad */}
-        <div className="flex items-center justify-between border-y border-ink-4 py-3 mb-4">
-          <div>
-            <div className="text-[14px] font-medium">Cantidad</div>
-            <div className="text-[12px] text-text-tertiary">Máx 6 por compra</div>
-          </div>
-          <div className="flex items-center gap-1 rounded-full bg-ink-3 p-1">
-            <button
-              type="button"
-              onClick={() => setQty(Math.max(1, qty - 1))}
-              className="flex h-8 w-8 items-center justify-center rounded-full text-[18px] text-text-secondary hover:text-text-primary"
-            >−</button>
-            <span className="min-w-[24px] text-center text-[15px] font-semibold">{qty}</span>
-            <button
-              type="button"
-              onClick={() => setQty(Math.min(Math.min(6, maxQty), qty + 1))}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-white text-[18px]"
-            >+</button>
-          </div>
-        </div>
-
-        {/* Total */}
-        <div className="mb-4 flex items-center justify-between">
-          <span className="text-[16px] font-semibold">Total</span>
-          <span className="text-[22px] font-bold text-yellow-300 tracking-snug">
-            ${total.toLocaleString("es-AR")}
-          </span>
-        </div>
-
-        {/* Form de datos */}
-        {showForm && (
-          <div className="mb-4 flex flex-col gap-3">
-            <input
-              placeholder="Tu nombre completo"
-              value={buyerName}
-              onChange={(e) => setBuyerName(e.target.value)}
-              className="h-[46px] w-full rounded-[12px] border border-ink-4 bg-ink-1 px-4 text-[15px] text-text-primary outline-none placeholder:text-text-tertiary focus:border-violet-400"
-            />
-            <input
-              type="email"
-              placeholder="tucorreo@email.com"
-              value={buyerEmail}
-              onChange={(e) => { setBuyerEmail(e.target.value); setEmailMismatch(false); }}
-              className="h-[46px] w-full rounded-[12px] border border-ink-4 bg-ink-1 px-4 text-[15px] text-text-primary outline-none placeholder:text-text-tertiary focus:border-violet-400"
-            />
-            <input
-              type="email"
-              placeholder="Confirmá tu correo"
-              value={emailConfirm}
-              onChange={(e) => { setEmailConfirm(e.target.value); setEmailMismatch(false); }}
-              className={[
-                "h-[46px] w-full rounded-[12px] border bg-ink-1 px-4 text-[15px] text-text-primary outline-none placeholder:text-text-tertiary focus:border-violet-400",
-                emailMismatch ? "border-danger" : "border-ink-4",
-              ].join(" ")}
-            />
-            {emailMismatch && <p className="text-[12px] text-danger">Los correos no coinciden.</p>}
-          </div>
-        )}
-
-        {/* CTA */}
-        {!showForm ? (
-          <Button
-            variant="primary"
-            size="lg"
-            full
-            iconRight="arrowRight"
-            disabled={isSoldOut || !hasTypes}
-            onClick={() => setShowForm(true)}
-          >
-            {isSoldOut ? "Entradas agotadas" : "Comprar con MercadoPago"}
-          </Button>
         ) : (
-          <div className="flex gap-2">
-            <Button variant="ghost" size="md" onClick={() => setShowForm(false)}>Volver</Button>
-            <Button
-              variant="primary"
-              size="lg"
-              full
-              loading={isLoading}
-              disabled={isSoldOut || maxQty <= 0 || !buyerName.trim() || !buyerEmail.trim()}
-              onClick={handlePayment}
-            >
-              Ir al pago
-            </Button>
-          </div>
+          <p className="mb-5 text-[14px] text-text-tertiary">
+            No hay entradas disponibles para este evento.
+          </p>
         )}
+
+        <Button
+          variant="primary"
+          size="lg"
+          full
+          iconRight="arrowRight"
+          disabled={isSoldOut || !hasTypes}
+          onClick={onCheckout}
+        >
+          {isSoldOut ? "Entradas agotadas" : "Comprar entradas"}
+        </Button>
 
         <div className="mt-3 flex items-center justify-center gap-2 text-[12px] text-text-tertiary">
           <Icon name="check" size={14} />
@@ -472,7 +289,7 @@ function BuyPanel({
         </div>
       </div>
 
-      {/* Botones secundarios */}
+      {/* Acciones secundarias */}
       <div className="flex gap-2">
         <Button variant="outline" size="sm" full icon="heart">Guardar</Button>
         <Button variant="outline" size="sm" full icon="share" onClick={handleShare}>Compartir</Button>
