@@ -10,7 +10,8 @@ import {
   EventStats,
 } from "@/services/scanner";
 import { Html5Qrcode } from "html5-qrcode";
-import { Card, PageContainer } from "@/components/ui";
+import { Button, Card, Icon, EmptyState, Skeleton, PageContainer } from "@/components/ui";
+import { MiniKPI } from "@/components/MiniKPI";
 
 export default function ScannerPage() {
   const { user, loading: authLoading } = useAuth();
@@ -155,31 +156,34 @@ export default function ScannerPage() {
   if (!selectedEvent) {
     return (
       <PageContainer className="max-w-lg py-6 sm:py-8">
-        <h1 className="mb-2 text-xl font-bold tracking-tight text-white sm:text-2xl">
+        <h1 className="mb-2 text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
           Escáner de entradas
         </h1>
-        <p className="mb-6 text-sm text-zinc-400">
+        <p className="mb-6 text-sm text-text-tertiary">
           Hola {user.name}, seleccioná un evento para escanear entradas.
         </p>
 
         {error && (
           <div
-            className="mb-4 rounded-xl border border-red-500/30 bg-red-950/40 p-4"
+            className="mb-4 rounded-xl border border-danger bg-danger/10 p-4"
             role="alert"
           >
-            <p className="text-sm text-red-300">{error}</p>
+            <p className="text-sm text-danger">{error}</p>
           </div>
         )}
 
         {loadingEvents ? (
-          <p className="py-10 text-center text-sm text-zinc-500">Cargando eventos…</p>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} height={88} rounded />
+            ))}
+          </div>
         ) : events.length === 0 ? (
-          <Card className="p-8 text-center">
-            <p className="text-zinc-400">No tenés eventos asignados</p>
-            <p className="mt-2 text-sm text-zinc-500">
-              Pedile al organizador que te asigne a un evento
-            </p>
-          </Card>
+          <EmptyState
+            icon="qr"
+            title="Sin eventos asignados"
+            description="Pedile al organizador que te asigne a un evento para comenzar a escanear entradas."
+          />
         ) : (
           <div className="space-y-3">
             {events.map((event) => (
@@ -187,19 +191,27 @@ export default function ScannerPage() {
                 key={event.id}
                 type="button"
                 onClick={() => selectEvent(event)}
-                className="w-full rounded-2xl border border-white/10 bg-zinc-900/80 p-4 text-left transition-colors hover:border-violet-500/40 hover:bg-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
+                className="w-full text-left"
               >
-                <p className="font-semibold text-white">{event.name}</p>
-                <p className="mt-1 text-sm text-zinc-500">
-                  {new Date(event.event_date).toLocaleDateString("es-AR", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-                <p className="text-sm text-zinc-600">{event.location}</p>
+                <Card className="p-4 transition-all hover:border-violet-400 hover:bg-ink-3">
+                  <p className="font-semibold text-text-primary">{event.name}</p>
+                  <div className="mt-3 flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2 text-sm text-text-secondary">
+                      <Icon name="calendar" size={14} />
+                      {new Date(event.event_date).toLocaleDateString("es-AR", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-text-tertiary">
+                      <Icon name="pin" size={14} />
+                      {event.location}
+                    </div>
+                  </div>
+                </Card>
               </button>
             ))}
           </div>
@@ -210,31 +222,20 @@ export default function ScannerPage() {
 
   return (
     <PageContainer className="max-w-lg py-4 sm:py-6">
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        icon="chevronLeft"
         onClick={backToEvents}
-        className="mb-4 flex min-h-[44px] items-center text-sm text-zinc-400 transition-colors hover:text-white"
+        className="mb-4"
       >
-        <svg
-          className="w-5 h-5 mr-1"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
         Volver a eventos
-      </button>
+      </Button>
 
       <Card className="overflow-hidden p-0">
-        <div className="sticky top-[52px] z-10 border-b border-white/10 bg-gradient-to-r from-violet-700 to-violet-600 p-4 sm:relative sm:top-0">
-          <h2 className="text-lg font-bold text-white">{selectedEvent.name}</h2>
-          <p className="text-sm text-violet-100/90">
+        <div className="sticky top-[52px] z-10 border-b border-ink-4 bg-ink-3 p-4 sm:relative sm:top-0">
+          <h2 className="text-lg font-bold text-text-primary">{selectedEvent.name}</h2>
+          <p className="text-sm text-text-tertiary">
             {new Date(selectedEvent.event_date).toLocaleDateString("es-AR", {
               day: "numeric",
               month: "long",
@@ -245,19 +246,10 @@ export default function ScannerPage() {
         </div>
 
         {stats && (
-          <div className="grid grid-cols-3 gap-2 border-b border-white/10 bg-zinc-950/50 p-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-violet-400">{stats.scanned}</p>
-              <p className="text-xs text-zinc-500">Ingresaron</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-emerald-400">{stats.valid}</p>
-              <p className="text-xs text-zinc-500">Pendientes</p>
-            </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-zinc-300">{stats.total}</p>
-              <p className="text-xs text-zinc-500">Total</p>
-            </div>
+          <div className="grid grid-cols-3 gap-3 border-b border-ink-4 bg-ink-2/60 p-4">
+            <MiniKPI label="Ingresaron" value={String(stats.scanned)} tone="violet" />
+            <MiniKPI label="Pendientes" value={String(stats.valid)} tone="success" />
+            <MiniKPI label="Total" value={String(stats.total)} tone="neutral" />
           </div>
         )}
 
@@ -266,66 +258,42 @@ export default function ScannerPage() {
             <div
               className={`mb-4 rounded-2xl border-2 p-6 text-center ${
                 scanResult.valid
-                  ? "border-emerald-500/50 bg-emerald-950/40"
-                  : "border-red-500/50 bg-red-950/40"
+                  ? "border-success bg-success/10"
+                  : "border-danger bg-danger/10"
               }`}
             >
               <div
                 className={`mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full ${
-                  scanResult.valid ? "bg-emerald-500/20" : "bg-red-500/20"
+                  scanResult.valid ? "ring-2 ring-success ring-offset-2 ring-offset-ink-1 bg-success/10" : "ring-2 ring-danger ring-offset-2 ring-offset-ink-1 bg-danger/10"
                 }`}
               >
-                {scanResult.valid ? (
-                  <svg
-                    className="h-8 w-8 text-emerald-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="h-8 w-8 text-red-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
-                )}
+                <Icon
+                  name={scanResult.valid ? "check" : "close"}
+                  size={32}
+                  className={scanResult.valid ? "text-success" : "text-danger"}
+                />
               </div>
 
               <p
                 className={`text-lg font-bold ${
-                  scanResult.valid ? "text-emerald-300" : "text-red-300"
+                  scanResult.valid ? "text-success" : "text-danger"
                 }`}
               >
                 {scanResult.valid ? "ACCESO PERMITIDO" : "ACCESO DENEGADO"}
               </p>
               <p
                 className={`mt-1 text-sm ${
-                  scanResult.valid ? "text-emerald-400/90" : "text-red-400/90"
+                  scanResult.valid ? "text-success/90" : "text-danger/90"
                 }`}
               >
                 {scanResult.message}
               </p>
 
               {scanResult.ticket && (
-                <div className="mt-3 border-t border-white/10 pt-3">
-                  <p className="text-sm text-zinc-200">{scanResult.ticket.buyerName}</p>
+                <div className="mt-3 border-t border-ink-4 pt-3">
+                  <p className="text-sm text-text-primary">{scanResult.ticket.buyerName}</p>
                   {scanResult.ticket.buyerEmail && (
-                    <p className="text-xs text-zinc-500">{scanResult.ticket.buyerEmail}</p>
+                    <p className="text-xs text-text-tertiary">{scanResult.ticket.buyerEmail}</p>
                   )}
                 </div>
               )}
@@ -334,47 +302,57 @@ export default function ScannerPage() {
 
           <div
             id="qr-reader"
-            className={`rounded-lg overflow-hidden ${
+            className={`relative rounded-lg overflow-hidden ${
               scanning ? "block" : "hidden"
             }`}
             style={{ width: "100%" }}
-          />
+          >
+            {scanning && (
+              <>
+                {[
+                  "top-8 left-8",
+                  "top-8 right-8",
+                  "bottom-8 left-8",
+                  "bottom-8 right-8",
+                ].map((pos, i) => (
+                  <div
+                    key={i}
+                    className={`absolute w-6 h-6 border-2 border-yellow-300 ${pos} ${
+                      pos.includes("top left") ? "border-b-0 border-r-0" : ""
+                    } ${pos.includes("top right") ? "border-b-0 border-l-0" : ""} ${
+                      pos.includes("bottom left") ? "border-t-0 border-r-0" : ""
+                    } ${pos.includes("bottom right") ? "border-t-0 border-l-0" : ""}`}
+                  />
+                ))}
+                <div
+                  className="absolute left-0 right-0 h-0.5 bg-gradient-to-b from-yellow-300 via-yellow-300 to-transparent opacity-75 animate-[scanline_2s_ease-in-out_infinite]"
+                  style={{ width: "100%", height: "2px" }}
+                />
+              </>
+            )}
+          </div>
 
           {!scanning ? (
-            <button
+            <Button
               type="button"
+              variant="violet"
+              size="lg"
+              full
+              icon="qr"
               onClick={startCamera}
-              className="flex w-full min-h-[48px] items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 text-lg font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
               Escanear Entrada
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              full
               onClick={stopCamera}
-              className="mt-3 w-full min-h-[44px] rounded-xl border border-white/15 bg-zinc-800 py-3 font-semibold text-zinc-100 transition-colors hover:bg-zinc-700"
+              className="mt-3"
             >
               Detener cámara
-            </button>
+            </Button>
           )}
         </div>
       </Card>

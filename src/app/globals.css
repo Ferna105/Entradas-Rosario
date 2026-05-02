@@ -485,3 +485,13 @@ input, textarea, select { font-family: inherit; }
     height: 420px;
   }
 }
+
+/* Scanner — scan-line animation */
+@keyframes scanline {
+  0%, 100% {
+    top: 8%;
+  }
+  50% {
+    top: 88%;
+  }
+}
