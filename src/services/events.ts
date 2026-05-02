@@ -14,8 +14,20 @@ export const eventsService = {
     return apiClient.get<Event>(`/events/${id}`);
   },
 
-  async getUpcomingEvents(): Promise<Event[]> {
-    return apiClient.get<Event[]>("/events/upcoming");
+  async getUpcomingEvents(filters?: {
+    category?: string;
+    q?: string;
+    location?: string;
+    from?: string;
+    to?: string;
+  }): Promise<Event[]> {
+    const params: Record<string, string> = {};
+    if (filters?.category) params.category = filters.category;
+    if (filters?.q) params.q = filters.q;
+    if (filters?.location) params.location = filters.location;
+    if (filters?.from) params.from = filters.from;
+    if (filters?.to) params.to = filters.to;
+    return apiClient.get<Event[]>("/events/upcoming", { params });
   },
 
   async getMyEvents(): Promise<Event[]> {
@@ -29,6 +41,7 @@ export const eventsService = {
       location: data.location,
       event_date: data.event_date,
       image: data.image,
+      category: data.category,
       ticketTypes: data.ticketTypes.map((t, i) => ({
         id: t.id,
         name: t.name,
@@ -48,6 +61,7 @@ export const eventsService = {
     if (data.event_date !== undefined) payload.event_date = data.event_date;
     if (data.image !== undefined) payload.image = data.image;
     if (data.status !== undefined) payload.status = data.status;
+    if (data.category !== undefined) payload.category = data.category;
     if (data.ticketTypes !== undefined) {
       payload.ticketTypes = data.ticketTypes.map((t, i) => ({
         id: t.id,

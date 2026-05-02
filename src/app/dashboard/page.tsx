@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Event } from "@/types/event";
 import { eventsService } from "@/services/events";
 import { mpService } from "@/services/mercadopago";
+import { dashboardService, type DashboardStats } from "@/services/dashboard";
 import { apiClient } from "@/services/api";
 import { Button, EmptyState, PageContainer, Skeleton, useToast } from "@/components/ui";
 import { EventCardOrg } from "@/components/EventCardOrg";
@@ -47,6 +48,7 @@ function DashboardPageContent() {
   const [mpLoading, setMpLoading] = useState(false);
   const [scannersByEvent, setScannersByEvent] = useState<Record<number, ScannerInfo[]>>({});
   const [pendingByEvent, setPendingByEvent] = useState<Record<number, PendingInvitation[]>>({});
+  const [stats, setStats] = useState<DashboardStats | null>(null);
 
   useEffect(() => {
     const mpParam = searchParams.get("mp");
@@ -81,9 +83,10 @@ function DashboardPageContent() {
 
     async function loadData() {
       try {
-        const [eventsData, mpStatusData] = await Promise.all([
+        const [eventsData, mpStatusData, statsData] = await Promise.all([
           eventsService.getMyEvents(),
           mpService.getStatus(),
+          dashboardService.getStats().catch(() => null),
         ]);
 
         const normalized = eventsData.map((e) => ({
@@ -94,6 +97,7 @@ function DashboardPageContent() {
 
         setEvents(normalized);
         setMpStatus(mpStatusData);
+        setStats(statsData);
 
         const scannersMap: Record<number, ScannerInfo[]> = {};
         const pendingMap: Record<number, PendingInvitation[]> = {};
@@ -174,7 +178,13 @@ function DashboardPageContent() {
     }
   };
 
-  const activeCount = events.filter((e) => e.status === "published").length;
+  const fmtMoney = (n: number) =>
+    new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      maximumFractionDigits: 0,
+    }).format(n);
+  const fmtInt = (n: number) => new Intl.NumberFormat("es-AR").format(n);
 
   if (authLoading || loading) return <LoadingSkeleton />;
 
@@ -191,16 +201,26 @@ function DashboardPageContent() {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div title="Próximamente" className="cursor-help">
-          <MiniKPI label="INGRESOS DEL MES" value="—" tone="success" className="h-full" />
-        </div>
-        <div title="Próximamente" className="cursor-help">
-          <MiniKPI label="ENTRADAS VENDIDAS" value="—" tone="violet" className="h-full" />
-        </div>
-        <MiniKPI label="EVENTOS ACTIVOS" value={String(activeCount)} tone="yellow" />
-        <div title="Próximamente" className="cursor-help">
-          <MiniKPI label="A LIQUIDAR (MP)" value="—" tone="neutral" className="h-full" />
-        </div>
+        <MiniKPI
+          label="INGRESOS DEL MES"
+          value={stats ? fmtMoney(stats.revenueThisMonth) : "—"}
+          tone="success"
+        />
+        <MiniKPI
+          label="ENTRADAS VENDIDAS"
+          value={stats ? fmtInt(stats.ticketsSold) : "—"}
+          tone="violet"
+        />
+        <MiniKPI
+          label="EVENTOS ACTIVOS"
+          value={stats ? fmtInt(stats.activeEvents) : "—"}
+          tone="yellow"
+        />
+        <MiniKPI
+          label="A LIQUIDAR (MP)"
+          value={stats ? fmtMoney(stats.pendingPayout) : "—"}
+          tone="neutral"
+        />
       </div>
 
       {/* Mis eventos */}

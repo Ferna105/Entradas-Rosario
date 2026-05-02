@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { CreateEventData, TicketTypeFormRow } from "@/types/event";
+import {
+  CreateEventData,
+  EVENT_CATEGORIES,
+  EventCategory,
+  TicketTypeFormRow,
+} from "@/types/event";
 import { Button, Card, Input, Textarea } from "@/components/ui";
 import { FormSection } from "@/components/FormSection";
 
@@ -39,6 +44,7 @@ export default function EventForm({
     location: initialData?.location || "",
     event_date: formatDateForInput(initialData?.event_date) || "",
     image: initialData?.image || "",
+    category: (initialData?.category as EventCategory | undefined) ?? "otros",
     ticketTypes:
       initialData?.ticketTypes && initialData.ticketTypes.length > 0
         ? initialData.ticketTypes.map((t) => ({
@@ -108,6 +114,7 @@ export default function EventForm({
         location: form.location || undefined,
         event_date: new Date(form.event_date).toISOString(),
         image: form.image || undefined,
+        category: form.category as EventCategory,
         ticketTypes: form.ticketTypes.map((t, i) => ({
           id: t.id,
           name: t.name.trim(),
@@ -173,6 +180,32 @@ export default function EventForm({
                 label="Descripción"
                 placeholder="Contá de qué se trata el evento..."
               />
+              <div>
+                <label
+                  htmlFor="category"
+                  className="mb-[6px] block text-[12px] font-semibold uppercase tracking-[0.04em] text-text-secondary"
+                >
+                  Categoría
+                </label>
+                <select
+                  id="category"
+                  name="category"
+                  value={form.category}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      category: e.target.value as EventCategory,
+                    }))
+                  }
+                  className="h-[42px] w-full appearance-none rounded-[12px] border border-ink-4 bg-ink-2 px-3 text-[14px] capitalize text-text-primary outline-none transition-colors focus:border-violet-400 focus:[box-shadow:0_0_0_3px_rgba(139,92,255,0.15)]"
+                >
+                  {EVENT_CATEGORIES.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </FormSection>
 
             <FormSection title="Lugar y fecha">

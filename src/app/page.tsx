@@ -5,10 +5,39 @@ import Link from "next/link";
 import EventList from "@/components/EventList";
 import { Ticket } from "@/components/Ticket";
 import { Badge, Button, EmptyState, Icon, PageContainer, Skeleton } from "@/components/ui";
-import { Event } from "@/types/event";
+import { Event, EVENT_CATEGORIES, EventCategory } from "@/types/event";
 import { eventsService } from "@/services/events";
 
-const CATEGORIES = ["todos", "música", "trap", "rock", "electrónica", "festival"];
+const CATEGORY_FILTERS: { value: "todos" | EventCategory; label: string }[] = [
+  { value: "todos", label: "todos" },
+  ...EVENT_CATEGORIES.map((c) => ({ value: c.value, label: c.label })),
+];
+
+type DateRangePreset = "any" | "week" | "month" | "quarter";
+
+const DATE_PRESETS: { value: DateRangePreset; label: string }[] = [
+  { value: "any", label: "Cualquier momento" },
+  { value: "week", label: "Esta semana" },
+  { value: "month", label: "Este mes" },
+  { value: "quarter", label: "Próximos 3 meses" },
+];
+
+function rangeFromPreset(preset: DateRangePreset): { from?: string; to?: string } {
+  if (preset === "any") return {};
+  const now = new Date();
+  const from = now.toISOString();
+  if (preset === "week") {
+    const to = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    return { from, to: to.toISOString() };
+  }
+  if (preset === "month") {
+    const to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+    return { from, to: to.toISOString() };
+  }
+  // quarter
+  const to = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
+  return { from, to: to.toISOString() };
+}
 
 const PLACEHOLDER_TICKETS = [
   { title: "Festival Sónico 2026", venue: "Costanera Sur · CABA", date: "Sáb 1 Nov · 14:00", type: "VIP", code: "EVA-7H2K9P", holder: "Vos" },
@@ -61,21 +90,50 @@ export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState("todos");
-  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"todos" | EventCategory>("todos");
+
+  // Inputs (lo que está escribiendo el usuario)
+  const [searchInput, setSearchInput] = useState("");
+  const [locationInput, setLocationInput] = useState("");
+  const [datePreset, setDatePreset] = useState<DateRangePreset>("any");
+
+  // Filtros aplicados (lo que se mandó al server)
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [appliedLocation, setAppliedLocation] = useState("");
+  const [appliedDatePreset, setAppliedDatePreset] = useState<DateRangePreset>("any");
 
   useEffect(() => {
-    eventsService.getUpcomingEvents()
+    setLoading(true);
+    setError("");
+    const range = rangeFromPreset(appliedDatePreset);
+    eventsService
+      .getUpcomingEvents({
+        category: filter === "todos" ? undefined : filter,
+        q: appliedSearch || undefined,
+        location: appliedLocation || undefined,
+        from: range.from,
+        to: range.to,
+      })
       .then(setEvents)
       .catch(() => setError("No se pudieron cargar los eventos."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [filter, appliedSearch, appliedLocation, appliedDatePreset]);
 
-  const filtered = events.filter((e) => {
-    const matchesSearch = !search || e.name.toLowerCase().includes(search.toLowerCase()) || (e.location ?? "").toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = filter === "todos" || e.name.toLowerCase().includes(filter);
-    return matchesSearch && matchesCategory;
-  });
+  const applyFilters = () => {
+    setAppliedSearch(searchInput.trim());
+    setAppliedLocation(locationInput.trim());
+    setAppliedDatePreset(datePreset);
+  };
+
+  const clearAll = () => {
+    setFilter("todos");
+    setSearchInput("");
+    setLocationInput("");
+    setDatePreset("any");
+    setAppliedSearch("");
+    setAppliedLocation("");
+    setAppliedDatePreset("any");
+  };
 
   if (loading) return <HomeSkeletons />;
 
@@ -141,32 +199,55 @@ export default function Home() {
       {/* ── SEARCH + FILTROS + GRID ── */}
       <PageContainer className="pb-20">
         {/* Search bar segmentada */}
-        <div className="mb-8 overflow-hidden rounded-full border border-ink-4 bg-ink-2 p-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            applyFilters();
+          }}
+          className="mb-8 overflow-hidden rounded-[28px] border border-ink-4 bg-ink-2 p-2 sm:rounded-full"
+        >
           <div className="flex flex-col gap-0 sm:grid sm:grid-cols-[1.5fr_1px_1fr_1px_1fr_auto] sm:items-center">
             <div className="flex items-center gap-3 px-5 py-3 sm:py-0">
               <Icon name="search" size={18} className="shrink-0 text-text-tertiary" />
               <input
                 placeholder="¿A qué evento querés ir?"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="flex-1 border-none bg-transparent text-[14px] text-text-primary outline-none placeholder:text-text-tertiary"
               />
             </div>
             <div className="hidden h-6 w-px bg-ink-4 sm:block" />
             <div className="flex items-center gap-3 border-t border-ink-4 px-5 py-3 sm:border-none sm:py-0">
               <Icon name="pin" size={18} className="shrink-0 text-text-tertiary" />
-              <span className="text-[14px] text-text-secondary">Buenos Aires</span>
+              <input
+                placeholder="Ciudad o lugar"
+                value={locationInput}
+                onChange={(e) => setLocationInput(e.target.value)}
+                className="flex-1 border-none bg-transparent text-[14px] text-text-primary outline-none placeholder:text-text-tertiary"
+              />
             </div>
             <div className="hidden h-6 w-px bg-ink-4 sm:block" />
             <div className="flex items-center gap-3 border-t border-ink-4 px-5 py-3 sm:border-none sm:py-0">
               <Icon name="calendar" size={18} className="shrink-0 text-text-tertiary" />
-              <span className="text-[14px] text-text-secondary">Este mes</span>
+              <select
+                value={datePreset}
+                onChange={(e) => setDatePreset(e.target.value as DateRangePreset)}
+                className="flex-1 cursor-pointer appearance-none border-none bg-transparent text-[14px] text-text-primary outline-none"
+              >
+                {DATE_PRESETS.map((p) => (
+                  <option key={p.value} value={p.value} className="bg-ink-2">
+                    {p.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="px-2 pt-2 sm:pt-0">
-              <Button variant="primary" size="md" className="w-full sm:w-auto">Buscar</Button>
+              <Button type="submit" variant="primary" size="md" className="w-full sm:w-auto">
+                Buscar
+              </Button>
             </div>
           </div>
-        </div>
+        </form>
 
         {/* Header sección + filtros */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4" id="esta-semana">
@@ -174,21 +255,21 @@ export default function Home() {
             Lo que se viene
           </h2>
           <div className="flex flex-wrap gap-2">
-            {CATEGORIES.map((cat) => (
+            {CATEGORY_FILTERS.map((cat) => (
               <button
-                key={cat}
+                key={cat.value}
                 type="button"
-                onClick={() => setFilter(cat)}
+                onClick={() => setFilter(cat.value)}
                 className={[
                   "rounded-full border px-[14px] py-2 text-[13px] font-medium capitalize transition-all",
-                  filter === cat
+                  filter === cat.value
                     ? "border-violet-400 bg-[rgba(139,92,255,0.15)] text-violet-200"
                     : "border-ink-4 bg-ink-2 text-text-secondary hover:border-ink-5",
                 ]
                   .filter(Boolean)
                   .join(" ")}
               >
-                {cat}
+                {cat.label}
               </button>
             ))}
           </div>
@@ -201,19 +282,19 @@ export default function Home() {
             title="No se pudieron cargar los eventos"
             description="Revisá tu conexión e intentá de nuevo."
           />
-        ) : filtered.length === 0 ? (
+        ) : events.length === 0 ? (
           <EmptyState
             icon="search"
             title="Sin resultados"
             description="Probá con otro término o cambiá los filtros."
             action={
-              <Button variant="outline" size="sm" onClick={() => { setFilter("todos"); setSearch(""); }}>
+              <Button variant="outline" size="sm" onClick={clearAll}>
                 Limpiar filtros
               </Button>
             }
           />
         ) : (
-          <EventList events={filtered} />
+          <EventList events={events} />
         )}
       </PageContainer>
 

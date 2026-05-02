@@ -10,6 +10,23 @@ export interface TicketTypePublic {
   isSoldOut: boolean;
 }
 
+export type EventCategory =
+  | "musica"
+  | "trap"
+  | "rock"
+  | "electronica"
+  | "festival"
+  | "otros";
+
+export const EVENT_CATEGORIES: { value: EventCategory; label: string }[] = [
+  { value: "musica", label: "música" },
+  { value: "trap", label: "trap" },
+  { value: "rock", label: "rock" },
+  { value: "electronica", label: "electrónica" },
+  { value: "festival", label: "festival" },
+  { value: "otros", label: "otros" },
+];
+
 export interface Event {
   id: number;
   seller_id: number;
@@ -19,6 +36,7 @@ export interface Event {
   event_date: string;
   image: string | null;
   status: "draft" | "published" | "cancelled" | "finished";
+  category: EventCategory;
   marketplace_fee_percent: number;
   created_at: string;
   minPrice: number;
@@ -39,6 +57,7 @@ export interface CreateEventData {
   location?: string;
   event_date: string;
   image?: string;
+  category?: EventCategory;
   ticketTypes: TicketTypeFormRow[];
 }
 
