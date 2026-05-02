@@ -61,7 +61,7 @@ export default function Header() {
               <Icon name="flash" size={18} color="var(--violet-900)" strokeWidth={2.5} />
             </div>
             <span className="text-[17px] font-bold tracking-snug text-text-primary">
-              EventoAbierto
+              Entradas Rosario
             </span>
           </Link>
 
@@ -226,7 +226,7 @@ export default function Header() {
               >
                 <Icon name="flash" size={15} color="var(--violet-900)" strokeWidth={2.5} />
               </div>
-              <span className="text-[15px] font-bold">EventoAbierto</span>
+              <span className="text-[15px] font-bold">Entradas Rosario</span>
             </div>
 
             <ul className="flex flex-col gap-1 p-3">

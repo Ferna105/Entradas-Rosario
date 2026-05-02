@@ -123,7 +123,7 @@ export function Ticket({ event, ticketType, code, holder, qrCode, used }: Ticket
                 </svg>
               </div>
               <span className="text-[11px] font-semibold tracking-[0.18em] text-white/70 uppercase">
-                EventoAbierto
+                Entradas Rosario
               </span>
               {used && <Badge tone="neutral" size="sm">USADA</Badge>}
             </div>

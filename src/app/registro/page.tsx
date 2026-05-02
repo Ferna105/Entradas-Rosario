@@ -57,7 +57,7 @@ export default function RegisterPage() {
             Crear cuenta
           </h1>
           <p className="mb-8 text-center text-sm text-zinc-500">
-            Registrate en EventoAbierto
+            Registrate en Entradas Rosario
           </p>
 
           {error && (

@@ -39,7 +39,7 @@ export default function LoginPage() {
             Iniciar sesión
           </h1>
           <p className="mb-8 text-center text-sm text-zinc-500">
-            Ingresá a tu cuenta de EventoAbierto
+            Ingresá a tu cuenta de Entradas Rosario
           </p>
 
           {error && (

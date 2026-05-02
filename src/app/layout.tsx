@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EventoAbierto · Comprá y vendé entradas online",
+  title: "Entradas Rosario · Comprá y vendé entradas online",
   description:
     "Comprá entradas en segundos o creá tu propio evento y empezá a vender hoy mismo. Sin vueltas, con MercadoPago.",
   icons: {

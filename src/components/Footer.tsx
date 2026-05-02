@@ -45,7 +45,7 @@ export default function Footer() {
               >
                 <Icon name="flash" size={18} color="var(--violet-900)" strokeWidth={2.5} />
               </div>
-              <span className="text-[18px] font-bold tracking-snug">EventoAbierto</span>
+              <span className="text-[18px] font-bold tracking-snug">Entradas Rosario</span>
             </div>
             <p className="mb-5 max-w-[320px] text-[14px] leading-relaxed text-text-secondary">
               Comprá entradas en segundos. Vendé las tuyas con MercadoPago. Sin vueltas.
@@ -99,7 +99,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-ink-4 pt-6">
           <div className="text-[12px] text-text-tertiary">
-            © {new Date().getFullYear()} EventoAbierto · Hecho en Argentina 🇦🇷
+            © {new Date().getFullYear()} Entradas Rosario · Hecho en Argentina 🇦🇷
           </div>
           <div className="flex gap-5 text-[12px] text-text-tertiary">
             <Link href="/terminos" className="hover:text-text-secondary transition-colors">Términos</Link>
