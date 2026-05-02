@@ -3,7 +3,7 @@
 import { FC, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Event } from "@/types/event";
+import { Event, EVENT_CATEGORIES, EventCategory } from "@/types/event";
 import { Avatar, Badge, Button, Card, Icon } from "@/components/ui";
 
 interface EventDetailProps {
@@ -23,7 +23,9 @@ const formatDate = (d: string) =>
   new Date(d).toLocaleDateString("es-AR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 const formatTime = (d: string) =>
   new Date(d).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-
+function formatCategory(category: EventCategory) {
+  return EVENT_CATEGORIES.find((c) => c.value === category)?.label || category;
+}
 const PLACEHOLDER_ATTENDEES = ["Ana L.", "Bruno S.", "Cami D.", "Diego R.", "Eli V."];
 
 const EventDetail: FC<EventDetailProps> = ({ event }) => {
@@ -76,7 +78,7 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
 
         <div className="relative mx-auto flex h-full max-w-[1180px] flex-col justify-end px-6 pb-8 lg:px-8">
           <div className="flex flex-wrap gap-2 mb-4">
-            <Badge tone="violet">Música</Badge>
+            <Badge tone="violet">{formatCategory(event.category)}</Badge>
             <Badge tone="yellow" icon="flame">Trending</Badge>
           </div>
           <h1 className="text-[clamp(28px,5vw,64px)] font-bold leading-[1.0] tracking-tight text-white max-w-[800px]">

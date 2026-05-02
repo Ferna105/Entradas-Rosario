@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Event } from "@/types/event";
+import { Event, EVENT_CATEGORIES, EventCategory } from "@/types/event";
 import { Badge, Icon } from "@/components/ui";
 
 const GRADIENTS = [
@@ -35,6 +35,10 @@ function formatDate(d: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function formatCategory(category: EventCategory) {
+  return EVENT_CATEGORIES.find((c) => c.value === category)?.label || category;
 }
 
 interface EventCardProps {
@@ -151,7 +155,7 @@ export function EventCard({ event, variant = "default" }: EventCardProps) {
 
         {/* Content */}
         <div className="flex flex-col gap-[10px] p-4">
-          <Badge tone="violet" size="sm">Música</Badge>
+          <Badge tone="violet" size="sm">{formatCategory(event.category)}</Badge>
           <h3 className="text-[17px] font-semibold leading-[1.2] tracking-snug">{event.name}</h3>
           {event.location && (
             <div className="flex items-center gap-[6px] text-[13px] text-text-secondary">
