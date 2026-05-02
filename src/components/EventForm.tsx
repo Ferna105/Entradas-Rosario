@@ -1,22 +1,15 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { CreateEventData, TicketTypeFormRow } from "@/types/event";
-import { Button, Card, Input, Label, Textarea } from "@/components/ui";
+import { Button, Card, Input, Textarea } from "@/components/ui";
+import { FormSection } from "@/components/FormSection";
 
 interface EventFormProps {
   initialData?: Partial<CreateEventData> & { ticketTypes?: TicketTypeFormRow[] };
   onSubmit: (data: CreateEventData) => Promise<void>;
   submitLabel: string;
   title: string;
-}
-
-function SectionTitle({ children }: { children: ReactNode }) {
-  return (
-    <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
-      {children}
-    </h2>
-  );
 }
 
 function defaultTicketTypes(): TicketTypeFormRow[] {
@@ -159,103 +152,82 @@ export default function EventForm({
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="space-y-4">
-              <SectionTitle>Información general</SectionTitle>
-              <div>
-                <Label htmlFor="name" className="mb-1.5">
-                  Nombre del evento *
-                </Label>
+            <FormSection title="Información general">
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                required
+                maxLength={200}
+                value={form.name}
+                onChange={handleChange}
+                label="Nombre del evento *"
+                placeholder="Ej: Coldplay en Rosario"
+              />
+              <Textarea
+                id="description"
+                name="description"
+                rows={4}
+                value={form.description}
+                onChange={handleChange}
+                label="Descripción"
+                placeholder="Contá de qué se trata el evento..."
+              />
+            </FormSection>
+
+            <FormSection title="Lugar y fecha">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Input
                   type="text"
-                  id="name"
-                  name="name"
+                  id="location"
+                  name="location"
+                  value={form.location}
+                  onChange={handleChange}
+                  label="Ubicación"
+                  icon="pin"
+                  placeholder="Ej: Estadio Gigante de Arroyito"
+                />
+                <Input
+                  type="datetime-local"
+                  id="event_date"
+                  name="event_date"
                   required
-                  maxLength={200}
-                  value={form.name}
+                  value={form.event_date}
                   onChange={handleChange}
-                  placeholder="Ej: Coldplay en Rosario"
+                  label="Fecha y hora *"
+                  icon="calendar"
                 />
               </div>
+            </FormSection>
 
-              <div>
-                <Label htmlFor="description" className="mb-1.5">
-                  Descripción
-                </Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  rows={4}
-                  value={form.description}
-                  onChange={handleChange}
-                  placeholder="Contá de qué se trata el evento..."
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <SectionTitle>Lugar y fecha</SectionTitle>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <Label htmlFor="location" className="mb-1.5">
-                    Ubicación
-                  </Label>
-                  <Input
-                    type="text"
-                    id="location"
-                    name="location"
-                    value={form.location}
-                    onChange={handleChange}
-                    placeholder="Ej: Estadio Gigante de Arroyito"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="event_date" className="mb-1.5">
-                    Fecha y hora *
-                  </Label>
-                  <Input
-                    type="datetime-local"
-                    id="event_date"
-                    name="event_date"
-                    required
-                    value={form.event_date}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-                <SectionTitle>Tipos de entrada</SectionTitle>
+            <FormSection
+              title="Tipos de entrada"
+              action={
                 <Button
                   type="button"
                   variant="ghost"
-                  className="shrink-0 text-sm text-violet-400"
+                  size="sm"
                   onClick={addTicketType}
                 >
                   + Agregar tipo
                 </Button>
-              </div>
-              <p className="text-xs text-zinc-500">
-                Cada tipo tiene su propio precio y cupo (General, VIP, Preventa,
-                etc.).
-              </p>
+              }
+            >
               <div className="space-y-4">
                 {form.ticketTypes.map((row, index) => (
                   <Card
                     key={index}
-                    className="border-white/10 bg-zinc-950/40 p-4"
+                    className="border-ink-4 bg-ink-2/60 p-4"
                   >
-                    <div className="mb-3 flex items-center justify-between gap-2">
-                      <span className="text-xs font-medium text-zinc-400">
+                    <div className="mb-4 flex items-center justify-between">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
                         Tipo {index + 1}
                       </span>
                       {form.ticketTypes.length > 1 && (
                         <Button
                           type="button"
                           variant="ghost"
-                          className="h-auto py-1 text-xs text-red-400"
+                          size="sm"
                           onClick={() => removeTicketType(index)}
                         >
                           Quitar
@@ -264,83 +236,82 @@ export default function EventForm({
                     </div>
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                       <div className="sm:col-span-3">
-                        <Label className="mb-1.5">Nombre *</Label>
                         <Input
                           required
                           value={row.name}
                           onChange={(e) =>
                             updateTicketType(index, "name", e.target.value)
                           }
+                          label="Nombre *"
                           placeholder="Ej: General, VIP, Preventa"
                         />
                       </div>
-                      <div>
-                        <Label className="mb-1.5">Precio (ARS) *</Label>
-                        <Input
-                          type="number"
-                          required
-                          min={0}
-                          step="0.01"
-                          value={row.price}
-                          onChange={(e) =>
-                            updateTicketType(
-                              index,
-                              "price",
-                              parseFloat(e.target.value) || 0
-                            )
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label className="mb-1.5">Cupo *</Label>
-                        <Input
-                          type="number"
-                          required
-                          min={1}
-                          value={row.capacity}
-                          onChange={(e) =>
-                            updateTicketType(
-                              index,
-                              "capacity",
-                              parseInt(e.target.value, 10) || 1
-                            )
-                          }
-                        />
-                      </div>
+                      <Input
+                        type="number"
+                        required
+                        min={0}
+                        step="0.01"
+                        value={row.price}
+                        onChange={(e) =>
+                          updateTicketType(
+                            index,
+                            "price",
+                            parseFloat(e.target.value) || 0
+                          )
+                        }
+                        label="Precio (ARS) *"
+                        suffix="$"
+                      />
+                      <Input
+                        type="number"
+                        required
+                        min={1}
+                        value={row.capacity}
+                        onChange={(e) =>
+                          updateTicketType(
+                            index,
+                            "capacity",
+                            parseInt(e.target.value, 10) || 1
+                          )
+                        }
+                        label="Cupo *"
+                      />
                     </div>
                   </Card>
                 ))}
               </div>
-            </div>
+            </FormSection>
 
-            <div className="space-y-4">
-              <SectionTitle>Imagen</SectionTitle>
-              <div>
-                <Label htmlFor="image" className="mb-1.5">
-                  URL de la imagen
-                </Label>
-                <Input
-                  type="url"
-                  id="image"
-                  name="image"
-                  value={form.image}
-                  onChange={handleChange}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                />
-              </div>
-            </div>
+            <FormSection title="Imagen">
+              <Input
+                type="url"
+                id="image"
+                name="image"
+                value={form.image}
+                onChange={handleChange}
+                label="URL de la imagen"
+                icon="upload"
+                placeholder="https://ejemplo.com/imagen.jpg"
+              />
+            </FormSection>
 
-            <div className="flex flex-col-reverse gap-3 border-t border-white/10 pt-6 sm:flex-row sm:justify-end">
+            <div className="flex flex-col-reverse gap-3 border-t border-ink-4 pt-6 sm:flex-row sm:justify-end">
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={() => window.history.back()}
                 className="w-full sm:w-auto"
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-                {loading ? "Guardando…" : submitLabel}
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={loading}
+                loading={loading}
+                className="w-full sm:w-auto"
+              >
+                {submitLabel}
               </Button>
             </div>
           </form>
