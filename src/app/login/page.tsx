@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Button, Card, Input, Label, PageContainer } from "@/components/ui";
+import { Button, Card, Input, PageContainer } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -35,63 +35,61 @@ export default function LoginPage() {
     <PageContainer className="flex min-h-[80vh] flex-col items-center justify-center py-10">
       <div className="w-full max-w-md">
         <Card className="p-6 sm:p-8">
-          <h1 className="mb-2 text-center text-xl font-bold tracking-tight text-white sm:text-2xl md:text-3xl">
+          <h1 className="mb-2 text-center text-xl font-bold tracking-tight text-text-primary sm:text-2xl md:text-3xl">
             Iniciar sesión
           </h1>
-          <p className="mb-8 text-center text-sm text-zinc-500">
+          <p className="mb-8 text-center text-sm text-text-tertiary">
             Ingresá a tu cuenta de Entradas Rosario
           </p>
 
           {error && (
             <div
-              className="mb-6 rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-300"
+              className="mb-6 rounded-xl border border-danger bg-danger/10 px-4 py-3 text-sm text-danger"
               role="alert"
             >
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <Label htmlFor="email" className="mb-1.5">
-                Email
-              </Label>
-              <Input
-                type="email"
-                id="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tucorreo@email.com"
-                autoComplete="email"
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="email"
+              id="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              label="Email"
+              placeholder="tucorreo@email.com"
+              autoComplete="email"
+            />
 
-            <div>
-              <Label htmlFor="password" className="mb-1.5">
-                Contraseña
-              </Label>
-              <Input
-                type="password"
-                id="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Tu contraseña"
-                autoComplete="current-password"
-              />
-            </div>
+            <Input
+              type="password"
+              id="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              label="Contraseña"
+              placeholder="Tu contraseña"
+              autoComplete="current-password"
+            />
 
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Ingresando…" : "Ingresar"}
+            <Button
+              type="submit"
+              variant="primary"
+              full
+              disabled={loading}
+              loading={loading}
+            >
+              Ingresar
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-zinc-500">
+          <p className="mt-6 text-center text-sm text-text-tertiary">
             ¿No tenés cuenta?{" "}
             <Link
               href="/registro"
-              className="font-semibold text-violet-400 hover:text-violet-300"
+              className="font-semibold text-violet-400 transition-colors hover:text-violet-300"
             >
               Registrate
             </Link>

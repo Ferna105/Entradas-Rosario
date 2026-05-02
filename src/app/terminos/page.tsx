@@ -8,17 +8,17 @@ export const metadata: Metadata = {
     "Términos y condiciones de uso del sitio Entradas Rosario. Leé las reglas de compra, uso de la plataforma y responsabilidades.",
 };
 
-const section = "space-y-3 text-[15px] leading-relaxed text-zinc-300";
-const h2 = "text-lg font-semibold text-white";
+const section = "space-y-3 text-[15px] leading-relaxed text-text-secondary";
+const h2 = "text-lg font-semibold text-text-primary";
 
 export default function TerminosPage() {
   return (
     <PageContainer className="py-10 sm:py-14">
       <div className="mx-auto max-w-3xl">
-        <h1 className="mb-6 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+        <h1 className="mb-6 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
           Términos y condiciones
         </h1>
-        <p className="mb-8 text-sm text-zinc-500">
+        <p className="mb-8 text-sm text-text-tertiary">
           Última actualización: marzo de 2026. Este texto es orientativo; conviene revisarlo
           con asesoramiento legal antes de uso comercial.
         </p>

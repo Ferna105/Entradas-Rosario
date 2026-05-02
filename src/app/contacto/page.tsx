@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   Input,
-  Label,
   PageContainer,
   Textarea,
 } from "@/components/ui";
@@ -51,31 +50,33 @@ export default function ContactoPage() {
   return (
     <PageContainer className="flex min-h-[80vh] flex-col py-10 sm:py-14">
       <div className="mx-auto w-full max-w-lg">
-        <h1 className="mb-2 text-center text-2xl font-bold tracking-tight text-white sm:text-3xl">
-          Contacto
-        </h1>
-        <p className="mb-8 text-center text-sm text-zinc-400">
-          Escribinos y te respondemos a la brevedad. También podés escribir a{" "}
-          <a
-            href="mailto:rosario.entradas.ok@gmail.com"
-            className="font-medium text-violet-400 hover:text-violet-300"
-          >
-            rosario.entradas.ok@gmail.com
-          </a>{" "}
-          o llamar al{" "}
-          <a
-            href="tel:+543413092012"
-            className="font-medium text-violet-400 hover:text-violet-300"
-          >
-            +54 341 309-2012
-          </a>
-          .
-        </p>
+        <div className="mb-8 text-center">
+          <h1 className="mb-3 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+            Contacto
+          </h1>
+          <p className="text-text-secondary">
+            Escribinos y te respondemos a la brevedad. También podés escribir a{" "}
+            <a
+              href="mailto:rosario.entradas.ok@gmail.com"
+              className="font-medium text-violet-400 transition-colors hover:text-violet-300"
+            >
+              rosario.entradas.ok@gmail.com
+            </a>{" "}
+            o llamar al{" "}
+            <a
+              href="tel:+543413092012"
+              className="font-medium text-violet-400 transition-colors hover:text-violet-300"
+            >
+              +54 341 309-2012
+            </a>
+            .
+          </p>
+        </div>
 
         <Card className="p-6 sm:p-8">
           {success && (
             <div
-              className="mb-6 rounded-xl border border-emerald-500/30 bg-emerald-950/40 px-4 py-3 text-sm text-emerald-200"
+              className="mb-6 rounded-xl border border-success bg-success/10 px-4 py-3 text-sm text-success"
               role="status"
             >
               Mensaje enviado. Gracias por contactarnos.
@@ -84,78 +85,67 @@ export default function ContactoPage() {
 
           {error && (
             <div
-              className="mb-6 rounded-xl border border-red-500/30 bg-red-950/40 px-4 py-3 text-sm text-red-300"
+              className="mb-6 rounded-xl border border-danger bg-danger/10 px-4 py-3 text-sm text-danger"
               role="alert"
             >
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <Label htmlFor="name" className="mb-1.5">
-                Nombre
-              </Label>
-              <Input
-                id="name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Tu nombre"
-                autoComplete="name"
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              id="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              label="Nombre"
+              placeholder="Tu nombre"
+              autoComplete="name"
+            />
 
-            <div>
-              <Label htmlFor="email" className="mb-1.5">
-                Email
-              </Label>
-              <Input
-                type="email"
-                id="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tucorreo@email.com"
-                autoComplete="email"
-              />
-            </div>
+            <Input
+              type="email"
+              id="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              label="Email"
+              placeholder="tucorreo@email.com"
+              autoComplete="email"
+            />
 
-            <div>
-              <Label htmlFor="subject" className="mb-1.5">
-                Asunto <span className="font-normal text-zinc-500">(opcional)</span>
-              </Label>
-              <Input
-                id="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Ej.: consulta sobre un evento"
-              />
-            </div>
+            <Input
+              id="subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              label="Asunto (opcional)"
+              placeholder="Ej.: consulta sobre un evento"
+            />
 
-            <div>
-              <Label htmlFor="message" className="mb-1.5">
-                Mensaje
-              </Label>
-              <Textarea
-                id="message"
-                required
-                rows={6}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Escribí tu mensaje (mínimo 10 caracteres)"
-                minLength={10}
-                className="resize-y"
-              />
-            </div>
+            <Textarea
+              id="message"
+              required
+              rows={6}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              label="Mensaje"
+              placeholder="Escribí tu mensaje (mínimo 10 caracteres)"
+              minLength={10}
+            />
 
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Enviando…" : "Enviar mensaje"}
+            <Button
+              type="submit"
+              variant="primary"
+              full
+              disabled={loading}
+              loading={loading}
+            >
+              Enviar mensaje
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-zinc-500">
-            <Link href="/" className="text-violet-400 hover:text-violet-300">
+          <p className="mt-6 text-center text-sm text-text-tertiary">
+            <Link href="/" className="text-violet-400 transition-colors hover:text-violet-300">
               Volver al inicio
             </Link>
           </p>
