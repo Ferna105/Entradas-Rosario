@@ -1,114 +1,113 @@
 "use client";
 
-import { FC } from "react";
 import Link from "next/link";
-import { PageContainer } from "@/components/ui";
+import { Icon, PageContainer } from "@/components/ui";
 
-const Footer: FC = () => {
+const COLS = [
+  {
+    title: "Comprar",
+    links: [
+      { label: "Explorar eventos", href: "/" },
+      { label: "Esta semana", href: "/#esta-semana" },
+      { label: "Mis entradas", href: "/mis-entradas" },
+    ],
+  },
+  {
+    title: "Vender",
+    links: [
+      { label: "Crear un evento", href: "/eventos/crear" },
+      { label: "Cómo funciona", href: "/nosotros" },
+      { label: "Vincular MercadoPago", href: "/dashboard" },
+    ],
+  },
+  {
+    title: "Soporte",
+    links: [
+      { label: "Contacto", href: "/contacto" },
+      { label: "Términos", href: "/terminos" },
+      { label: "Privacidad", href: "/privacidad" },
+    ],
+  },
+];
+
+export default function Footer() {
   return (
-    <footer className="mt-auto border-t border-white/10 bg-zinc-900 py-10 sm:py-12">
-      <PageContainer>
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+    <footer className="mt-auto border-t border-ink-4 bg-ink-0">
+      <PageContainer className="py-14">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+
+          {/* Marca */}
           <div>
-            <h3 className="mb-3 text-lg font-bold text-white">EventoAbierto</h3>
-            <p className="text-sm leading-relaxed text-zinc-400">
+            <div className="mb-4 flex items-center gap-[10px]">
+              <div
+                className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-yellow-300"
+                style={{ transform: "rotate(-8deg)" }}
+              >
+                <Icon name="flash" size={18} color="var(--violet-900)" strokeWidth={2.5} />
+              </div>
+              <span className="text-[18px] font-bold tracking-snug">EventoAbierto</span>
+            </div>
+            <p className="mb-5 max-w-[320px] text-[14px] leading-relaxed text-text-secondary">
               Comprá entradas en segundos. Vendé las tuyas con MercadoPago. Sin vueltas.
             </p>
+
+            {/* Redes */}
+            <div className="flex gap-2">
+              {(["instagram", "twitter", "music"] as const).map((icon) => (
+                <button
+                  key={icon}
+                  type="button"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-4 bg-ink-2 text-text-secondary transition-colors hover:text-text-primary"
+                  aria-label={icon}
+                >
+                  <Icon name={icon} size={16} />
+                </button>
+              ))}
+            </div>
+
+            {/* MP badge */}
+            <div className="mt-6 inline-flex items-center gap-[10px] rounded-full border border-ink-4 bg-ink-2 px-[14px] py-[10px] text-[12px] text-text-secondary">
+              <span
+                className="h-2 w-2 rounded-full bg-success"
+                style={{ boxShadow: "0 0 8px var(--success)" }}
+              />
+              Pagos procesados por MercadoPago
+            </div>
           </div>
 
-          <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-              Enlaces rápidos
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/"
-                  className="text-sm text-zinc-400 transition-colors hover:text-violet-400"
-                >
-                  Eventos
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/nosotros"
-                  className="text-sm text-zinc-400 transition-colors hover:text-violet-400"
-                >
-                  Nosotros
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contacto"
-                  className="text-sm text-zinc-400 transition-colors hover:text-violet-400"
-                >
-                  Contacto
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-              Legal
-            </h4>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  href="/terminos"
-                  className="text-sm text-zinc-400 transition-colors hover:text-violet-400"
-                >
-                  Términos y Condiciones
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/privacidad"
-                  className="text-sm text-zinc-400 transition-colors hover:text-violet-400"
-                >
-                  Política de Privacidad
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
-              Contacto
-            </h4>
-            <ul className="space-y-2 text-sm text-zinc-400">
-              <li>
-                Email:{" "}
-                <a
-                  href="mailto:rosario.entradas.ok@gmail.com"
-                  className="text-violet-400 transition-colors hover:text-violet-300"
-                >
-                  rosario.entradas.ok@gmail.com
-                </a>
-              </li>
-              <li>
-                Tel:{" "}
-                <a
-                  href="tel:+543413092012"
-                  className="text-violet-400 transition-colors hover:text-violet-300"
-                >
-                  +54 341 309-2012
-                </a>
-              </li>
-              <li>Rosario, Santa Fe</li>
-            </ul>
-          </div>
+          {/* Columnas de links */}
+          {COLS.map((col) => (
+            <div key={col.title}>
+              <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-tertiary">
+                {col.title}
+              </div>
+              <div className="flex flex-col gap-[10px]">
+                {col.links.map((l) => (
+                  <Link
+                    key={l.label}
+                    href={l.href}
+                    className="text-[13px] text-text-secondary transition-colors hover:text-text-primary"
+                  >
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-8 text-center text-sm text-zinc-500">
-          <p>
-            &copy; {new Date().getFullYear()} EventoAbierto. Todos los derechos
-            reservados.
-          </p>
+        {/* Bottom bar */}
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-ink-4 pt-6">
+          <div className="text-[12px] text-text-tertiary">
+            © {new Date().getFullYear()} EventoAbierto · Hecho en Argentina 🇦🇷
+          </div>
+          <div className="flex gap-5 text-[12px] text-text-tertiary">
+            <Link href="/terminos" className="hover:text-text-secondary transition-colors">Términos</Link>
+            <Link href="/privacidad" className="hover:text-text-secondary transition-colors">Privacidad</Link>
+            <span>ES · ARS</span>
+          </div>
         </div>
       </PageContainer>
     </footer>
   );
-};
-
-export default Footer;
+}
