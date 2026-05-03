@@ -45,6 +45,7 @@ export default function EventForm({
     event_date: formatDateForInput(initialData?.event_date) || "",
     image: initialData?.image || "",
     category: (initialData?.category as EventCategory | undefined) ?? "otros",
+    show_attendees: initialData?.show_attendees ?? false,
     ticketTypes:
       initialData?.ticketTypes && initialData.ticketTypes.length > 0
         ? initialData.ticketTypes.map((t) => ({
@@ -115,6 +116,7 @@ export default function EventForm({
         event_date: new Date(form.event_date).toISOString(),
         image: form.image || undefined,
         category: form.category as EventCategory,
+        show_attendees: form.show_attendees,
         ticketTypes: form.ticketTypes.map((t, i) => ({
           id: t.id,
           name: t.name.trim(),
@@ -326,6 +328,32 @@ export default function EventForm({
                 icon="upload"
                 placeholder="https://ejemplo.com/imagen.jpg"
               />
+            </FormSection>
+
+            <FormSection title="Quiénes van">
+              <label className="flex cursor-pointer items-start gap-3 rounded-[12px] border border-ink-4 bg-ink-2/60 p-4 transition-colors hover:border-violet-400/50">
+                <input
+                  type="checkbox"
+                  checked={form.show_attendees}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      show_attendees: e.target.checked,
+                    }))
+                  }
+                  className="mt-[3px] h-4 w-4 cursor-pointer accent-violet-500"
+                />
+                <div className="flex-1">
+                  <div className="text-[14px] font-semibold text-text-primary">
+                    Mostrar la sección &quot;Quiénes van&quot; en este evento
+                  </div>
+                  <p className="mt-1 text-[12.5px] leading-relaxed text-text-secondary">
+                    Si está activa, en la página del evento se va a mostrar quiénes
+                    confirmaron asistencia. Cada comprador elige si quiere aparecer o
+                    no en la lista durante el checkout.
+                  </p>
+                </div>
+              </label>
             </FormSection>
 
             <div className="flex flex-col-reverse gap-3 border-t border-ink-4 pt-6 sm:flex-row sm:justify-end">

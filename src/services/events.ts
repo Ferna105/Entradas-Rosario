@@ -1,5 +1,10 @@
 import { apiClient } from "./api";
-import { Event, CreateEventData, UpdateEventData } from "@/types/event";
+import {
+  Event,
+  CreateEventData,
+  UpdateEventData,
+  AttendeesResponse,
+} from "@/types/event";
 
 interface CreatePaymentPreferenceParams {
   eventId: number;
@@ -7,6 +12,7 @@ interface CreatePaymentPreferenceParams {
   buyerEmail: string;
   buyerName: string;
   quantity: number;
+  showInAttendees?: boolean;
 }
 
 export const eventsService = {
@@ -42,6 +48,7 @@ export const eventsService = {
       event_date: data.event_date,
       image: data.image,
       category: data.category,
+      show_attendees: data.show_attendees ?? false,
       ticketTypes: data.ticketTypes.map((t, i) => ({
         id: t.id,
         name: t.name,
@@ -62,6 +69,8 @@ export const eventsService = {
     if (data.image !== undefined) payload.image = data.image;
     if (data.status !== undefined) payload.status = data.status;
     if (data.category !== undefined) payload.category = data.category;
+    if (data.show_attendees !== undefined)
+      payload.show_attendees = data.show_attendees;
     if (data.ticketTypes !== undefined) {
       payload.ticketTypes = data.ticketTypes.map((t, i) => ({
         id: t.id,
@@ -85,5 +94,9 @@ export const eventsService = {
       "/payments/create-preference",
       params
     );
+  },
+
+  async getAttendees(eventId: number | string): Promise<AttendeesResponse> {
+    return apiClient.get<AttendeesResponse>(`/events/${eventId}/attendees`);
   },
 };

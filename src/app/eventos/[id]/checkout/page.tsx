@@ -147,6 +147,7 @@ function CheckoutContent() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [showInAttendees, setShowInAttendees] = useState(false);
 
   // Paso 3
   const [isPaying, setIsPaying] = useState(false);
@@ -185,6 +186,7 @@ function CheckoutContent() {
         buyerEmail: email.trim(),
         buyerName: `${firstName.trim()} ${lastName.trim()}`,
         quantity: Math.min(qty, maxQty),
+        showInAttendees: event.show_attendees ? showInAttendees : false,
       });
       window.location.href = initPoint;
     } catch {
@@ -366,6 +368,26 @@ function CheckoutContent() {
                     wrapperClassName="sm:col-span-2"
                   />
                 </div>
+
+                {event.show_attendees && (
+                  <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-[12px] border border-ink-4 bg-ink-3 p-4 transition-colors hover:border-violet-400/50">
+                    <input
+                      type="checkbox"
+                      checked={showInAttendees}
+                      onChange={(e) => setShowInAttendees(e.target.checked)}
+                      className="mt-[3px] h-4 w-4 cursor-pointer accent-violet-500"
+                    />
+                    <div className="flex-1">
+                      <div className="text-[14px] font-semibold text-text-primary">
+                        Quiero aparecer en &quot;Quiénes van&quot;
+                      </div>
+                      <p className="mt-1 text-[12.5px] leading-relaxed text-text-secondary">
+                        Tu primer nombre y la inicial del apellido van a ser visibles
+                        en la página del evento.
+                      </p>
+                    </div>
+                  </label>
+                )}
               </Card>
 
               <div className="flex justify-between">

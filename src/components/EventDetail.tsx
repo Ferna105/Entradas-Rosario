@@ -1,10 +1,16 @@
 "use client";
 
-import { FC, useMemo } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Event, EVENT_CATEGORIES, EventCategory } from "@/types/event";
+import {
+  AttendeesResponse,
+  Event,
+  EVENT_CATEGORIES,
+  EventCategory,
+} from "@/types/event";
 import { Avatar, Badge, Button, Card, Icon, useToast } from "@/components/ui";
+import { eventsService } from "@/services/events";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useAuth } from "@/context/AuthContext";
 
@@ -28,7 +34,10 @@ const formatTime = (d: string) =>
 function formatCategory(category: EventCategory) {
   return EVENT_CATEGORIES.find((c) => c.value === category)?.label || category;
 }
-const PLACEHOLDER_ATTENDEES = ["Ana L.", "Bruno S.", "Cami D.", "Diego R.", "Eli V."];
+
+function formatAttendee(name: string, initial: string) {
+  return initial ? `${name} ${initial}` : name;
+}
 
 const EventDetail: FC<EventDetailProps> = ({ event }) => {
   const sortedTypes = useMemo(
@@ -49,6 +58,29 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
   const { user } = useAuth();
   const { addToast } = useToast();
   const favorited = isFavorited(event.id);
+
+  const [attendees, setAttendees] = useState<AttendeesResponse | null>(null);
+  const [attendeesLoading, setAttendeesLoading] = useState(false);
+
+  useEffect(() => {
+    if (!event.show_attendees) return;
+    let cancelled = false;
+    setAttendeesLoading(true);
+    eventsService
+      .getAttendees(event.id)
+      .then((res) => {
+        if (!cancelled) setAttendees(res);
+      })
+      .catch(() => {
+        if (!cancelled) setAttendees({ total: 0, attendees: [] });
+      })
+      .finally(() => {
+        if (!cancelled) setAttendeesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [event.id, event.show_attendees]);
 
   const handleCheckout = () => {
     router.push(`/eventos/${event.id}/checkout?type=${firstAvailableId}&qty=1`);
@@ -165,26 +197,13 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
               </div>
             )}
 
-            {/* Quiénes van — placeholder */}
-            <div>
-              <h2 className="mb-4 text-[24px] font-semibold tracking-snug">Quiénes van</h2>
-              <div className="flex items-center justify-between rounded-[16px] border border-ink-4 bg-ink-2 p-5">
-                <div className="flex">
-                  {PLACEHOLDER_ATTENDEES.map((name, i) => (
-                    <div key={name} style={{ marginLeft: i === 0 ? 0 : -10 }}>
-                      <Avatar name={name} size={42} ring="var(--ink-2)" />
-                    </div>
-                  ))}
-                  <div
-                    className="flex h-[42px] w-[42px] items-center justify-center rounded-full border-2 border-ink-2 bg-ink-3 text-[12px] font-semibold text-text-secondary"
-                    style={{ marginLeft: -10 }}
-                  >
-                    +1k
-                  </div>
-                </div>
-                <Button variant="ghost" size="sm" iconRight="arrowRight">Ver lista</Button>
-              </div>
-            </div>
+            {/* Quiénes van — opcional, configurable por el organizador */}
+            {event.show_attendees && (
+              <AttendeesBlock
+                loading={attendeesLoading}
+                data={attendees}
+              />
+            )}
           </div>
 
           {/* ── PANEL LATERAL (desktop) ── */}
@@ -324,6 +343,93 @@ function TicketsPanel({ sortedTypes, isSoldOut, hasTypes, onCheckout, handleShar
           {favorited ? "Guardado" : "Guardar"}
         </Button>
         <Button variant="outline" size="sm" full icon="share" onClick={handleShare}>Compartir</Button>
+      </div>
+    </div>
+  );
+}
+
+/* ── AttendeesBlock ──────────────────────────────────────────────────────── */
+const MAX_PREVIEW = 5;
+
+interface AttendeesBlockProps {
+  loading: boolean;
+  data: AttendeesResponse | null;
+}
+
+function AttendeesBlock({ loading, data }: AttendeesBlockProps) {
+  const [showAll, setShowAll] = useState(false);
+  const list = data?.attendees ?? [];
+  const total = data?.total ?? 0;
+  const preview = showAll ? list : list.slice(0, MAX_PREVIEW);
+  const remaining = Math.max(0, list.length - MAX_PREVIEW);
+
+  return (
+    <div>
+      <h2 className="mb-4 text-[24px] font-semibold tracking-snug">
+        Quiénes van
+      </h2>
+      <div className="rounded-[16px] border border-ink-4 bg-ink-2 p-5">
+        {loading ? (
+          <p className="text-[13px] text-text-tertiary">Cargando asistentes…</p>
+        ) : list.length === 0 ? (
+          <p className="text-[13px] text-text-tertiary">
+            Todavía nadie confirmó. Sé el primero en sumarte.
+          </p>
+        ) : (
+          <>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-wrap">
+                {preview.map((a, i) => (
+                  <div
+                    key={`${a.name}-${i}`}
+                    style={{ marginLeft: i === 0 ? 0 : -10 }}
+                    title={formatAttendee(a.name, a.initial)}
+                  >
+                    <Avatar
+                      name={formatAttendee(a.name, a.initial)}
+                      size={42}
+                      ring="var(--ink-2)"
+                    />
+                  </div>
+                ))}
+                {!showAll && remaining > 0 && (
+                  <div
+                    className="flex h-[42px] w-[42px] items-center justify-center rounded-full border-2 border-ink-2 bg-ink-3 text-[12px] font-semibold text-text-secondary"
+                    style={{ marginLeft: -10 }}
+                  >
+                    +{remaining}
+                  </div>
+                )}
+              </div>
+              <div className="text-right">
+                <div className="text-[20px] font-bold tracking-snug text-yellow-300">
+                  {total.toLocaleString("es-AR")}
+                </div>
+                <div className="text-[11px] uppercase tracking-[0.06em] text-text-tertiary">
+                  Confirmados
+                </div>
+              </div>
+            </div>
+            {list.length > MAX_PREVIEW && (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {showAll &&
+                  list.map((a, i) => (
+                    <Badge key={`tag-${i}`} tone="neutral" size="sm">
+                      {formatAttendee(a.name, a.initial)}
+                    </Badge>
+                  ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  iconRight={showAll ? undefined : "arrowRight"}
+                  onClick={() => setShowAll((v) => !v)}
+                >
+                  {showAll ? "Ocultar lista" : "Ver lista"}
+                </Button>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );

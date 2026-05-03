@@ -38,9 +38,20 @@ export interface Event {
   status: "draft" | "published" | "cancelled" | "finished";
   category: EventCategory;
   marketplace_fee_percent: number;
+  show_attendees: boolean;
   created_at: string;
   minPrice: number;
   ticketTypes: TicketTypePublic[];
+}
+
+export interface PublicAttendee {
+  name: string;
+  initial: string;
+}
+
+export interface AttendeesResponse {
+  total: number;
+  attendees: PublicAttendee[];
 }
 
 export interface TicketTypeFormRow {
@@ -58,6 +69,7 @@ export interface CreateEventData {
   event_date: string;
   image?: string;
   category?: EventCategory;
+  show_attendees?: boolean;
   ticketTypes: TicketTypeFormRow[];
 }
 
