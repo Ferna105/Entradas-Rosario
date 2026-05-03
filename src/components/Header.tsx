@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import { Avatar, Icon } from "@/components/ui";
+import NotificationsBell from "@/components/NotificationsBell";
 
 const NAV_LINKS = [
   { href: "/", label: "Explorar" },
@@ -112,16 +113,7 @@ export default function Header() {
         <div className="hidden items-center gap-[10px] md:flex">
           {!loading && (
             <>
-              {/* Notificaciones placeholder */}
-              <button
-                type="button"
-                className="relative flex h-[38px] w-[38px] items-center justify-center rounded-full border border-ink-4 bg-ink-3 text-text-secondary transition-colors hover:text-text-primary"
-                aria-label="Notificaciones"
-              >
-                <Icon name="bell" size={16} />
-                {/* dot indicador */}
-                <span className="absolute right-[9px] top-[8px] h-2 w-2 rounded-full border-2 border-ink-3 bg-yellow-300" />
-              </button>
+              {user && <NotificationsBell />}
 
               {user ? (
                 <div className="relative">
