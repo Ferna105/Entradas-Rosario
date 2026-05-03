@@ -39,7 +39,12 @@ export default function Header() {
       );
     }
     if (user.type === "buyer") {
-      return <DropdownLink href="/mis-entradas" onClick={closeAll}>Mis entradas</DropdownLink>;
+      return (
+        <>
+          <DropdownLink href="/mis-entradas" onClick={closeAll}>Mis entradas</DropdownLink>
+          <DropdownLink href="/mis-favoritos" onClick={closeAll}>Mis favoritos</DropdownLink>
+        </>
+      );
     }
     if (user.type === "scanner") {
       return <DropdownLink href="/scanner" onClick={closeAll}>Escanear entradas</DropdownLink>;
@@ -76,13 +81,21 @@ export default function Header() {
                 {l.label}
               </Link>
             ))}
-            {user && (user.type === "buyer") && (
-              <Link
-                href="/mis-entradas"
-                className="rounded-full px-[14px] py-2 text-[13px] font-medium text-text-secondary transition-colors hover:bg-ink-3 hover:text-text-primary"
-              >
-                Mis entradas
-              </Link>
+            {user && user.type === "buyer" && (
+              <>
+                <Link
+                  href="/mis-entradas"
+                  className="rounded-full px-[14px] py-2 text-[13px] font-medium text-text-secondary transition-colors hover:bg-ink-3 hover:text-text-primary"
+                >
+                  Mis entradas
+                </Link>
+                <Link
+                  href="/mis-favoritos"
+                  className="rounded-full px-[14px] py-2 text-[13px] font-medium text-text-secondary transition-colors hover:bg-ink-3 hover:text-text-primary"
+                >
+                  Favoritos
+                </Link>
+              </>
             )}
             {user && (user.type === "seller" || user.type === "admin") && (
               <Link

@@ -4,7 +4,9 @@ import { FC, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Event, EVENT_CATEGORIES, EventCategory } from "@/types/event";
-import { Avatar, Badge, Button, Card, Icon } from "@/components/ui";
+import { Avatar, Badge, Button, Card, Icon, useToast } from "@/components/ui";
+import { useFavorites } from "@/context/FavoritesContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface EventDetailProps {
   event: Event;
@@ -43,9 +45,21 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
   }, [sortedTypes]);
 
   const router = useRouter();
+  const { isFavorited, toggle } = useFavorites();
+  const { user } = useAuth();
+  const { addToast } = useToast();
+  const favorited = isFavorited(event.id);
 
   const handleCheckout = () => {
     router.push(`/eventos/${event.id}/checkout?type=${firstAvailableId}&qty=1`);
+  };
+
+  const handleFavorite = async () => {
+    if (!user) {
+      addToast({ title: "Iniciá sesión para guardar favoritos", tone: "info" });
+      return;
+    }
+    await toggle(event.id);
   };
 
   const handleShare = () => {
@@ -181,6 +195,8 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
               hasTypes={hasTypes}
               onCheckout={handleCheckout}
               handleShare={handleShare}
+              favorited={favorited}
+              onToggleFavorite={handleFavorite}
             />
           </div>
         </div>
@@ -217,6 +233,8 @@ const EventDetail: FC<EventDetailProps> = ({ event }) => {
           hasTypes={hasTypes}
           onCheckout={handleCheckout}
           handleShare={handleShare}
+          favorited={favorited}
+          onToggleFavorite={handleFavorite}
         />
       </div>
     </div>
@@ -230,9 +248,11 @@ interface TicketsPanelProps {
   hasTypes: boolean;
   onCheckout: () => void;
   handleShare: () => void;
+  favorited: boolean;
+  onToggleFavorite: () => void;
 }
 
-function TicketsPanel({ sortedTypes, isSoldOut, hasTypes, onCheckout, handleShare }: TicketsPanelProps) {
+function TicketsPanel({ sortedTypes, isSoldOut, hasTypes, onCheckout, handleShare, favorited, onToggleFavorite }: TicketsPanelProps) {
   return (
     <div className="sticky top-6 self-start space-y-3">
       <div className="rounded-[20px] border border-ink-4 bg-ink-2 p-6">
@@ -293,7 +313,16 @@ function TicketsPanel({ sortedTypes, isSoldOut, hasTypes, onCheckout, handleShar
 
       {/* Acciones secundarias */}
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" full icon="heart">Guardar</Button>
+        <Button
+          variant="outline"
+          size="sm"
+          full
+          icon="heart"
+          onClick={onToggleFavorite}
+          className={favorited ? "text-danger" : ""}
+        >
+          {favorited ? "Guardado" : "Guardar"}
+        </Button>
         <Button variant="outline" size="sm" full icon="share" onClick={handleShare}>Compartir</Button>
       </div>
     </div>
